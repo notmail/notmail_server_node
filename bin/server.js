@@ -12,7 +12,7 @@ if(config.dev){
 }
 
 // Server imports
-var app = require('../app'),
+var app = require('../app/app'),
     http = require('http'),
     debug = require('debug')('notmail_server_node:server');
 

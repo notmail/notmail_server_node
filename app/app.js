@@ -13,7 +13,7 @@ var express = require('express'),
     path = require('path'),
     logger = require('morgan'),
     bodyParser = require('body-parser'),
-    config = require('./config.json'),
+    config = require('../config.json'),
     database = require('./model/database');
 
 /**
