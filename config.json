@@ -1,0 +1,6 @@
+{
+    "port": 6060,
+    "endpoint": "/notmail_api",
+    "dev": true,
+    "json_prettify": true
+}

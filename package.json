@@ -1,0 +1,16 @@
+{
+  "name": "notmail_server_node",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node bin/server.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.17.1",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.15.2",
+    "method-override": "^2.3.7",
+    "mongoose": "^4.8.6",
+    "morgan": "^1.8.1"
+  }
+}

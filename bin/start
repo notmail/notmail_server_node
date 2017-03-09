@@ -1,0 +1,31 @@
+#! /bin/bash
+
+#####################
+### Configuration ###
+#####################
+
+# Set server port
+# > default: 6060
+#PORT=6060               
+
+# Set endpoint path
+# > default: notmail_api
+# > Typical: use an empty string if proxy redirects request to /notmail_api
+#ENDPOINT=/notmail_api
+
+# Set node development state
+# > default: not set
+# > other: NODE_ENV=development
+#NODE_ENV=
+
+# Set JSON prettified in responses
+# > default: false
+#JSON_PRETTIFY=
+JSON_PRETTIFY=true
+
+
+#####################
+###     Launch    ###
+#####################
+echo running app.js laucnher
+node app.js
