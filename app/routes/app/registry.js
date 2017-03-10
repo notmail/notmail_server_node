@@ -71,9 +71,9 @@ router.get('/', function(req, res, next) {
 
 router.put('/', function(req, res, next) {
 
-    reqtools.check_auth_params(req.query, true)                 // Check total auth params
+    reqtools.check_auth_params(req.query, true, true)           // Check total auth params
     .then(() => {                                               // Check total authentication
-        return ApplicationSchema.authenticate(req.query, true)
+        return ApplicationSchema.authenticate(req.query, true, true)
     })
     .then(app => {                                              // Check connection checkSecurity
         return reqtools.appCheckSecurity(req, app);
@@ -92,6 +92,38 @@ router.put('/', function(req, res, next) {
     })
     .then(data => {                                             // Send correct response   
         res.status(200).send(data)
+    })
+    .catch(e => {                                               // Send error response      
+        try{                          
+            if(e.name === 'Bad Request')
+                reqtools.res_err(res, 400, e.name, e.message)
+            if(e.name === 'Unauthorized')
+                reqtools.res_err(res, 401, e.name, e.message)
+            if(e.name === 'Forbidden')
+                reqtools.res_err(res, 403, e.name, e.message)
+            else{
+                reqtools.res_err(res, 500, e.name, e.message)
+                console.log(e)
+            }
+        }catch(e) {
+            console.log('fatal error:' + e)
+            res.status(500).end();
+        }
+    })
+
+})
+
+router.delete('/', function(req, res, next) {
+
+    reqtools.check_auth_params(req.query, true, true)           // Check total auth params
+    .then(() => {                                               // Check total authentication
+        return ApplicationSchema.authenticate(req.query, true, true)
+    })
+    .then(app => {                                              // Save app changes
+        return app.remove();
+    })
+    .then(data => {                                             // Send correct response   
+        res.status(200).end()
     })
     .catch(e => {                                               // Send error response      
         try{                          
