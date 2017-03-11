@@ -11,15 +11,13 @@ var algorithm = 'aes-256-ctr';
     - to use in USER API:           _id (user.js) + '___' + _id (session.js) <-> token
 */
 function encrypt(text, pwd){
-    console.log(text)
     try{
         var cipher = crypto.createCipher(algorithm, pwd)
         var crypted = cipher.update(String(text),'utf8','hex')
         crypted += cipher.final('hex');
         return crypted;
     }catch (e){
-        console.log(e)
-        throw new error.SecurityError('Failed to encrypt')
+        throw new error.SecurityError('Failed to encrypt. ' + e.message)
     }
 }
  
@@ -30,7 +28,7 @@ function decrypt(text, pwd){
         dec += decipher.final('utf8');
         return dec;
     }catch (e){
-        throw new error.SecurityError('Failed to deecrypt')
+        throw new error.SecurityError('Failed to decrypt. ' + e.message)
     }
 }
 
@@ -40,7 +38,11 @@ function decrypt(text, pwd){
     - For shared_key and root_secret
 */
 function genRandomKey(){
-    return crypto.randomBytes(32).toString('hex')
+    try{
+        return crypto.randomBytes(32).toString('hex')
+    } catch(e){
+        throw new error.SecurityError('Failed to create randomkey. ' + e.message)
+    }
 }
 
 
@@ -49,27 +51,20 @@ function genRandomKey(){
     - For user password storage and check
 */
 function hashPassword(pwd){
-    return new Promise(function (resolve, reject) {
-        try{
-            if(pwd.length < 8) reject(new error.AuthenticationFailure('Password too short'))
-            let _ = bcrypt.hashSync(pwd, 10);
-            resolve(_)
-        }catch (e){
-            reject(new error.AuthenticationFailure('Failed to create password hash'))
-        }
-    })
+    try{
+        if(pwd.length < 8) throw new Error('Password too short')
+        return bcrypt.hashSync(pwd, 10);
+    }catch (e){
+        throw new error.AuthenticationFailure('Failed to create password hash.' + e.message)
+    }
 }
 
 function testPassword(pwd, hashed){
-    return new Promise(function (resolve, reject) {
-        try{
-            let _ = bcrypt.compareSync(pws, hashed)
-            if(_)   resolve(p)
-            else    reject(new error.AuthenticationFailure('Wrong Password'))
-        }catch (e){
-            reject(new error.AuthenticationFailure('Failed to check password hash'))
-        }
-    })
+    try{
+        if(!bcrypt.compareSync(pws, hashed)) throw new Error('Wrong Password')
+    }catch (e){
+        throw new error.AuthenticationFailure('Failed to test password. ' + e.message)
+    }
 }
 
 

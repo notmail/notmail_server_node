@@ -22,21 +22,27 @@ function res_err(res, status, code, msg){
 }
 
 
-function check_auth_params(params, shared_key, root_secret){
-    return new Promise(function (resolve, reject) {
-        if(!params.unique_id)
-            reject(new error.BadRequest('unique_id missing'));
-        if(shared_key && !params.shared_key)
-            reject(new error.BadRequest('shared_key missing'));
-        if(root_secret && !params.root_secret)
-            reject(new error.BadRequest('root_secret missing'));
-        resolve();
-    })
+function errorHandler(e, res){
+    try{                          
+        if(e.name === 'Bad Request')
+            res_err(res, 400, e.name, e.message)
+        if(e.name === 'Unauthorized')
+            res_err(res, 401, e.name, e.message)
+        if(e.name === 'Forbidden')
+            res_err(res, 403, e.name, e.message)
+        else{
+            res.status(500).end();
+            console.log(e)
+        }
+    }catch(e) {
+        console.log('fatal error:' + e)
+        res.status(500).end();
+    }
 }
 
 module.exports = {
     checkSecurity: checkSecurity,
     res_err: res_err,
     appCheckSecurity: appCheckSecurity,
-    check_auth_params: check_auth_params
+    errorHandler: errorHandler
 }

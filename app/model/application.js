@@ -22,43 +22,38 @@ var ApplicationSchema = new Schema({
 
 ApplicationSchema.virtual('unique_id').get(function() {
     try{
-        unique_id = security.encrypt(this._id, passwords.application_pwd)
+        return security.encrypt(this._id, passwords.application_pwd)
     }catch(e){
-        console.log(e)
-        unique_id = -1;
+        console.log(e);
+        return -1;
     }
-    return unique_id;
 });
 
 ApplicationSchema.statics.newApplication = function(body){
-    var self = this;
-    return new Promise(function (resolve, reject) {
-        try{
-            newapp = new self();
-            newapp.title = body.app.title; //#*
-            newapp.description = body.app.description; //#
-            newapp.url = body.app.url; //#
-            newapp.icon = body.app.icon; //#
+    try{
+        newapp = new this();
+        newapp.title = body.app.title; //#*
+        newapp.description = body.app.description; //#
+        newapp.url = body.app.url; //#
+        newapp.icon = body.app.icon; //#
 
-            newapp.shared_key = security.genRandomKey(); //*
-            newapp.root_secret = security.genRandomKey(); //*
+        newapp.shared_key = security.genRandomKey(); //*
+        newapp.root_secret = security.genRandomKey(); //*
 
-            resolve(newapp);
-        }catch(e){
-            reject(new Error('error creating application'));
-        }
-    })
+        return newapp;
+    }catch(e){
+        throw new Error('error creating application. ' + e.message);
+    }
 }
 
 ApplicationSchema.statics.authenticate = function(query, shared_key, root_secret){
     var self = this;
     return new Promise(function (resolve, reject) {
         try{
-            var id;
-            id = security.decrypt(query.unique_id, passwords.application_pwd)
-            if (id == -1) reject(new error.SecurityError('-1 while decoding id'))
+            var _id;
+            _id = security.decrypt(query.unique_id, passwords.application_pwd)
             
-            self.findById(id).exec()
+            self.findById(_id).exec()
             .then(app=>{
                 if(shared_key && query.shared_key != app.shared_key)
                     reject(new error.Unauthorized('Wrong shared_key'));
@@ -76,22 +71,20 @@ ApplicationSchema.statics.authenticate = function(query, shared_key, root_secret
     })
 }
 
-ApplicationSchema.statics.update_application = function(app, changes){
-    var self = this;
+ApplicationSchema.statics.updateApplication = function(app, changes){
     if (changes.app) changes = changes.app;
     else             throw new error.BadRequest('Wrong update data');
-    return new Promise(function (resolve, reject) {
-        try{
-            if(changes.url) app.url = changes.url;
-            if(changes.icon) app.icon = changes.icon;
-            if(changes.description) app.description = changes.description;
-            app.shared_key = security.genRandomKey();
-            resolve(app);
-        }catch(e){
-            console.log(e)
-            reject(new error.BadRequest('Wrong update data'));
-        }
-    })
+
+    try{
+        if(changes.url) app.url                 = changes.url;
+        if(changes.icon) app.icon               = changes.icon;
+        if(changes.description) app.description = changes.description;
+        app.shared_key                          = security.genRandomKey();
+        return app;
+    }catch(e){
+        console.log(e)
+        reject(new error.BadRequest('Wrong update data.' + e.message));
+    }
 }
 
 module.exports = mongoose.model('Application', ApplicationSchema)
