@@ -1,7 +1,8 @@
 var mongoose = require('mongoose');  
 var Schema   = mongoose.Schema,
     error    = _require('util/error'),
-    security = _require('util/security');
+    security = _require('util/security'),
+    passwords = _require('../passwords.json');
 
 var ApplicationSchema = new Schema({
     // Main fields
@@ -20,7 +21,13 @@ var ApplicationSchema = new Schema({
 })
 
 ApplicationSchema.virtual('unique_id').get(function() {
-    return this._id;
+    try{
+        unique_id = security.encrypt(this._id, passwords.application_pwd)
+    }catch(e){
+        console.log(e)
+        unique_id = -1;
+    }
+    return unique_id;
 });
 
 ApplicationSchema.statics.newApplication = function(body){
@@ -33,8 +40,8 @@ ApplicationSchema.statics.newApplication = function(body){
             newapp.url = body.app.url; //#
             newapp.icon = body.app.icon; //#
 
-            newapp.shared_key = security.genSharedKey(); //*
-            newapp.root_secret = security.genSharedKey(); //*
+            newapp.shared_key = security.genRandomKey(); //*
+            newapp.root_secret = security.genRandomKey(); //*
 
             resolve(newapp);
         }catch(e){
@@ -47,7 +54,11 @@ ApplicationSchema.statics.authenticate = function(query, shared_key, root_secret
     var self = this;
     return new Promise(function (resolve, reject) {
         try{
-            self.findById(query.unique_id).exec()
+            var id;
+            id = security.decrypt(query.unique_id, passwords.application_pwd)
+            if (id == -1) reject(new error.SecurityError('-1 while decoding id'))
+            
+            self.findById(id).exec()
             .then(app=>{
                 if(shared_key && query.shared_key != app.shared_key)
                     reject(new error.Unauthorized('Wrong shared_key'));
@@ -74,7 +85,7 @@ ApplicationSchema.statics.update_application = function(app, changes){
             if(changes.url) app.url = changes.url;
             if(changes.icon) app.icon = changes.icon;
             if(changes.description) app.description = changes.description;
-            app.shared_key = security.genSharedKey();
+            app.shared_key = security.genRandomKey();
             resolve(app);
         }catch(e){
             console.log(e)

@@ -27,9 +27,25 @@ class Unknown extends Error {
   }
 }
 
+class AuthenticationFailure extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'Authentication Failure';
+  }
+}
+
+class SecurityError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'Security Error';
+  }
+}
+
 module.exports = {
     BadRequest: BadRequest,
     Unauthorized: Unauthorized,
     Forbidden: Forbidden,
-    Unknown: Unknown
+    Unknown: Unknown,
+    AuthenticationFailure: AuthenticationFailure,
+    SecurityError: SecurityError
 }
