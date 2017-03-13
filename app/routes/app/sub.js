@@ -1,39 +1,33 @@
-var router            = require('express').Router(),
-    mongoose          = require('mongoose'),
-    Promise           = require('bluebird').Promise,
-    ApplicationSchema = _require('model/application'),
-    reqtools          = _require('util/reqtools'),
-    error             = _require('util/error'),
-    appmsgs           = require('./appmsgs.js'),
-    userSchema = _require('model/user');
+var router             = require('express').Router(),
+    mongoose           = require('mongoose'),
+    Promise            = require('bluebird').Promise,
+    ApplicationSchema  = _require('model/application'),
+    reqtools           = _require('util/reqtools'),
+    error              = _require('util/error'),
+    appmsgs            = require('./appmsgs.js'),
+    UserSchema         = _require('model/user');
+    SubscriptionSchema = _require('model/subscription');
 
 // PUT /app/sub (subscriptionRequest)
 router.put('/', function(req, res, next) {
-    Promise.all([
-        Promise.resolve()
-        .then(()      => {return appmsgs.checkAuthParams(req.query, true)})             // Validate request auth params       
-        .then(()      => {return ApplicationSchema.authenticate(req.query, true)})      // Check authentication
-        .then(app     => {return reqtools.appCheckSecurity(req, app)})                  // Check connection checkSecurity
-        .then(app     => {return app.save()})                                           // Save changes
-    ,
-        Promise.resolve()
-        .then(()      => {return appmsgs.subPostCheck(req.body)})
-        .then(()=>{
-                return
-                userSchema.findOne({notmail:req.body.dest.user})
-                .populate({
-                    path: 'subscriptions'
-                })
-                .exec()
-        })
-        .then((a)=>{
-            console.log(a)
-        })
-    ])
-    .then((data)=>{
-        
-    })
-    .then(data    => {res.status(200).send(data)})                                  // Send correct response   
+    let appref;
+    let subref;
+    Promise.resolve()
+    .then(()      => appmsgs.subPostCheck(req.body))                                // Validate request auth params       
+    .then(()      => appmsgs.checkAuthParams(req.query, true))                      // Validate request auth params       
+    .then(()      => ApplicationSchema.authenticate(req.query, true))               // Check authentication
+    .then(app     => reqtools.appCheckSecurity(req, app))                           // Check connection checkSecurity
+    .then(app     => app.save())                                                    // Save changes
+    .then(app     => {appref = app;                                                 // Get user data with subscriptions
+                      return UserSchema.findUserByNotmail(req.body.dest.user,'subscriptions')})
+    .then(user    => {                                                              // Get associated subscription and create if not exist
+                     try{           subref = user.retrieveSubscriptions(appref._id)[0].reset() }
+                     catch(e){      subref = SubscriptionSchema.newSubscription(appref);
+                                    user.subscriptions.push(subref) }
+                     user.markModified('subscriptions')
+                     return user.save();})
+    .then(user => appmsgs.subPutResponse(subref))                                   // Prepare response
+    .then(response=> res.status(200).send(response))                                // Send correct response   
     .catch(e      => {                                                              // Send error response      
         reqtools.errorHandler(e, res);
     })
@@ -42,23 +36,19 @@ router.put('/', function(req, res, next) {
 
 // GET /app/sub (checkSubRequest)
 router.get('/', function(req, res, next) {
-    
+    let appref;
     Promise.resolve()
-    .then(()      => {return appmsgs.checkAuthParams(req.query, true)})             // Validate request auth params       
-    .then(()      => {return ApplicationSchema.authenticate(req.query, true)})      // Check authentication
-    .then(app     => {return reqtools.appCheckSecurity(req, app)})                  // Check connection checkSecurity
-    .then(app     => {return app.save()})                                           // Save changes
-    .then(app=>{
-        UserSchema.connection.find(
-        {
-            subscriptions: {
-                $elemMatch: {validation: '1234'}
-            }
-        })
-
-    })
-
-    .then(data    => {res.status(200).send(data)})                                  // Send correct response   
+    .then(()      => appmsgs.subGetCheck(req.query))                                // Validate request auth params       
+    .then(()      => appmsgs.checkAuthParams(req.query, true))                      // Validate request auth params       
+    .then(()      => ApplicationSchema.authenticate(req.query, true))               // Check authentication
+    .then(app     => reqtools.appCheckSecurity(req, app))                           // Check connection checkSecurity
+    .then(app     => app.save())                                                    // Save changes
+    .then(app     => {appref = app;                                                 // Get user data with subscriptions
+                      return UserSchema.findUserByNotmail(req.query.user,'subscriptions')})
+    .then(user    => {                                                              // Get subscription related to application
+                    try{ return user.retrieveSubscriptions(appref._id)[0] }
+                    catch(e){throw new error.Forbidden('no subscription found' +e.message)}})
+    .then(sub     => res.status(200).end())                                         // Send correct response   
     .catch(e      => {                                                              // Send error response      
         reqtools.errorHandler(e, res);
     })

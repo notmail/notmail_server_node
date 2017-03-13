@@ -8,7 +8,7 @@ var Schema   = mongoose.Schema,
 
 var SubscriptionSchema = new Schema({
     //_id ('Number' autoIncremented)
-    _application: {type: mongoose.Schema.Types.ObjectId, ref: 'Application', required: true},
+    _application: {type: mongoose.Schema.Types.ObjectId, ref: 'Application', required: true, unique: true},
     status: {type: String, default: 'pending'},
     validation: {type: String, required: true},
     created: {type: Date, default: Date.now()}
@@ -28,17 +28,28 @@ SubscriptionSchema.methods.getApplication = function(){
     })
 }
 
-SubscriptionSchema.statics.newSession = function(user, params){
+SubscriptionSchema.statics.newSubscription = function(application){
     try{
-        newsession = new this();
-        newsession.expiration = Date.now() + 1000*60; // Inventado (1 min)
-        //newsession.permissions = params.permissions//['rdonly']
-        newsession.subs = params.subs//['ffsd']
-        return newsession;
+        newsubscription = new this();
+        newsubscription.status = 'pending';
+        newsubscription.validation = security.genRandomValidation();
+        newsubscription._application = application;
+        return newsubscription;
     }catch(e){
-        throw new Error('error creating new user. ' + e.message);
+        throw new Error('error creating new subscription. ' + e.message);
     }
 }
+SubscriptionSchema.methods.reset = function(){
+    try{
+        this.status = 'pending',
+        this.validation = security.genRandomValidation()
+        this.created = Date.now();
+        return this;
+    }catch(e){
+        throw new Error('error reseting subscription. ' + e.message);
+    }
+}
+
 
 /*
 SubscriptionSchema.statics.requestFindSubscription = function(user, appid){

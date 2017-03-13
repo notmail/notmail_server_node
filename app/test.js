@@ -11,17 +11,6 @@ UserSchema = require('./model/user');
 SubscriptionSchema = require('./model/subscription');
 ApplicationSchema = require('./model/application');
 
-UserSchema
-.findOne({notmail: 'jaime@ehu.es'})
-/*.populate({
-    path: 'subscriptions',
-    //match: { _application: 3},
-    select: 'status'
-    //select: 'name age -_id'
-})*/
-.exec()
-.then(r=>console.log('-->' + r))
-.catch(e=>console.log(e))
 
 // ApplicationSchema.findById("58c2ee1cc6c80150a2967cdc")
 // .then(app=>{
@@ -55,7 +44,7 @@ UserSchema
 // })
 // .catch(e=>console.log(e))
 
-/*
+
 user = UserSchema.newUser({
     notmail: 'jaime@ehu.es',
     pwd: '123412341234'
@@ -63,7 +52,7 @@ user = UserSchema.newUser({
 user.save()
 .then(user=>{console.log('created! ' + JSON.stringify(user))})
 .catch(e=>console.log(e))
-*/
+
 
 
 // function mypromise(test) {

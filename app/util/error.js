@@ -47,10 +47,10 @@ class SecurityError extends Error {
   }
 }
 
-class NoSuchSubscription extends Error {
+class SubscriptionError extends Error {
   constructor(message) {
     super(message);
-    this.name = 'NoSuchSubscription';
+    this.name = 'Subscription Error';
   }
 }
 
@@ -62,5 +62,5 @@ module.exports = {
     AuthenticationFailure: AuthenticationFailure,
     SecurityError: SecurityError,
     Removed: Removed,
-    NoSuchSubscription: NoSuchSubscription
+    SubscriptionError: SubscriptionError
 }

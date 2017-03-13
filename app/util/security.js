@@ -36,12 +36,21 @@ function decrypt(text, pwd){
 /*
     ## Random Values ##
     - For shared_key and root_secret
+    - For validation
 */
 function genRandomKey(){
     try{
         return crypto.randomBytes(32).toString('hex')
     } catch(e){
         throw new error.SecurityError('Failed to create randomkey. ' + e.message)
+    }
+}
+
+function genRandomValidation(){
+    try{
+        return crypto.randomBytes(4).toString('hex')
+    } catch(e){
+        throw new error.SecurityError('Failed to create randomkey validation. ' + e.message)
     }
 }
 
@@ -73,5 +82,6 @@ module.exports = {
     hashPassword: hashPassword,
     testPassword: testPassword,
     encrypt: encrypt,
-    decrypt: decrypt
+    decrypt: decrypt,
+    genRandomValidation: genRandomValidation
 }

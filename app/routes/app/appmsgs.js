@@ -66,3 +66,17 @@ exports.subPostCheck = function(body){
         throw new error.BadRequest('user missing');
     return body
 }
+
+exports.subGetCheck = function(params){
+    if(!params.user)
+        throw new error.BadRequest('user param missing');
+}
+
+exports.subPutResponse = function(sub){
+    let response = {
+        info:{
+            validation: sub.validation
+        }
+    }
+    return response;
+}

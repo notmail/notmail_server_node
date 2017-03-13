@@ -9,9 +9,12 @@ var UserSchema = new Schema({
     //_id
     notmail: { type: String, required: true, unique: true },
     pwd: { type: String, required: true},
+
     // embedded documents
     sessions: [SessionSchema.schema],
     subscriptions: [SubscriptionSchema.schema]
+
+    // linked documents
     // messages []
 })
 
@@ -33,7 +36,7 @@ UserSchema.statics.newUser = function(user){
 UserSchema.statics.authenticate = function(notmail, password){
     var self = this;
     return new Promise(function (resolve, reject) {
-        this.findOne({ 'notmail': 'notmail' }, 'pwd').exec()
+        this.findOne({ 'notmail': notmail }, 'pwd').exec()
         .then(user=>{
             if (user.pwd === password) resolve(user)
             else
@@ -43,6 +46,38 @@ UserSchema.statics.authenticate = function(notmail, password){
             reject(new error.AuthenticationFailure('Not such user'))
         })
     })
+}
+
+UserSchema.statics.findUserByNotmail = function(notmail, fields){
+    var self = this;
+    return new Promise(function (resolve, reject) {
+        self.findOne({ 'notmail': notmail }, fields).exec()
+        .then(user=>{
+            if(!user) reject(new error.Forbidden('Not such user'))
+            resolve(user)
+        })
+        .catch(e=>{
+            reject(new error.Forbidden('Not such user'))
+        })
+    })
+}
+
+UserSchema.methods.retrieveSubscriptions = function(applicationId, status){
+    if(!this.subscriptions) throw new error.SubscriptionError('No subscriptions field.')
+    let subscriptions = this.subscriptions;
+
+    if(applicationId){
+        subscriptions = subscriptions.filter(sub=>{
+            return (sub._application && (String(sub._application) == String(applicationId))) 
+        })
+    }
+    if(status){
+        subscriptions = subscriptions.filter(sub=>{
+            return sub.status == status;
+        })
+    }
+    if(subscriptions.length==0) throw new error.SubscriptionError('No subscriptions matched.')
+    return subscriptions;
 }
 
 UserSchema.methods.addSession = function(session){
