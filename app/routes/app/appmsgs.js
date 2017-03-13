@@ -1,5 +1,5 @@
 var exports = module.exports = {};
-
+var error = _require('./util/error')
 /**
  *      common
  */
@@ -56,3 +56,13 @@ exports.registryPutResponse = function(app){
     return response;
 }
 
+/**
+ *      /app/sub
+ */
+exports.subPostCheck = function(body){
+    if(!body.dest)
+        throw new error.BadRequest('dest missing');
+    if(!body.dest.user)
+        throw new error.BadRequest('user missing');
+    return body
+}

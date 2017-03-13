@@ -4,28 +4,22 @@ var Schema   = mongoose.Schema,
     security = _require('util/security');
 
 var SessionSchema = new Schema({
+    //_id
     expiration: { type: String, required: true },
     permissions: { type: Array },
     subs: { type: Array }
 })
 
-SessionSchema.virtual('usr').get(function() {
-    return this._id;
-});
-
 SessionSchema.statics.newSession = function(user, params){
-    var self = this;
-    return new Promise(function (resolve, reject) {
-        try{
-            newsession = new self();
-            newsession.expiration = Date.now() + 1000; // Inventado
-            //newsession.permissions = ['rdonly']
-            //newsession.subs = ['ffsd']
-            resolve(newsession);
-        }catch(e){
-            reject(new Error('error creating new user'));
-        }
-    })
+    try{
+        newsession = new this();
+        newsession.expiration = Date.now() + 1000*60; // Inventado (1 min)
+        //newsession.permissions = params.permissions//['rdonly']
+        newsession.subs = params.subs//['ffsd']
+        return newsession;
+    }catch(e){
+        throw new Error('error creating new user. ' + e.message);
+    }
 }
 
 module.exports = mongoose.model('Session', SessionSchema)

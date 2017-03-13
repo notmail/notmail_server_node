@@ -27,6 +27,13 @@ class Unknown extends Error {
   }
 }
 
+class Removed extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'Removed';
+  }
+}
+
 class AuthenticationFailure extends Error {
   constructor(message) {
     super(message);
@@ -47,5 +54,6 @@ module.exports = {
     Forbidden: Forbidden,
     Unknown: Unknown,
     AuthenticationFailure: AuthenticationFailure,
-    SecurityError: SecurityError
+    SecurityError: SecurityError,
+    Removed: Removed
 }

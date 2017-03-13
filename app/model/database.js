@@ -1,6 +1,7 @@
 /* Imports */
 var mongoose = require('mongoose'),
-    Promise = require('bluebird');
+    Promise = require('bluebird'),
+    autoIncrement = require('mongoose-auto-increment');
 
 /* Setup */
 mongoose.Promise = Promise;
@@ -8,6 +9,10 @@ mongoose.connect('mongodb://localhost/notmail');
 
 /* Schemas */
 require('./application');
+require('./session');
+require('./subscription');
+require('./user');
+require('./message');
 
 /* Connection */
 var db = mongoose.connection;
