@@ -40,5 +40,30 @@ SubscriptionSchema.statics.newSession = function(user, params){
     }
 }
 
+/*
+SubscriptionSchema.statics.requestFindSubscription = function(user, appid){
+    var self = this;
+    return new Promise(function (resolve, reject) {
+        UserSchema.collection
+        .aggregate([
+        { '$match': {notmail: 'jaime@ehu.es'}},
+        //{ '$match': {'_id': mongoose.Schema.Types.ObjectId('58c549ec1dd35c12283e31ac')}},
+        { '$project': {
+            list: {$filter: {
+                input: '$subscriptions',
+                as: 'list',
+                cond: {$eq: ['$$list.validation', '1234']}
+            }}
+        }}
+        ], function(err,res){
+            if(err) reject(err)
+            else    resolve(res)
+            if(!res[0].list[0]) console.log('no result')
+            else console.log(res[0].list[0])
+        })
+    })
+}
+*/
+
 //SubscriptionSchema.plugin(autoIncrement.plugin, 'Subscription');
 module.exports = mongoose.model('Subscription', SubscriptionSchema)

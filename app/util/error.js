@@ -1,4 +1,3 @@
-
 class BadRequest extends Error {
   constructor(message) {
     super(message);
@@ -48,6 +47,13 @@ class SecurityError extends Error {
   }
 }
 
+class NoSuchSubscription extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'NoSuchSubscription';
+  }
+}
+
 module.exports = {
     BadRequest: BadRequest,
     Unauthorized: Unauthorized,
@@ -55,5 +61,6 @@ module.exports = {
     Unknown: Unknown,
     AuthenticationFailure: AuthenticationFailure,
     SecurityError: SecurityError,
-    Removed: Removed
+    Removed: Removed,
+    NoSuchSubscription: NoSuchSubscription
 }
