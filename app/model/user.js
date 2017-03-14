@@ -1,9 +1,10 @@
-var mongoose = require('mongoose');  
-var Schema   = mongoose.Schema,
-    error    = _require('util/error'),
-    security = _require('util/security'),
-    SessionSchema = require('./session'),
+var mongoose           = require('mongoose');  
+var Schema             = mongoose.Schema,
+    error              = _require('util/error'),
+    security           = _require('util/security'),
+    SessionSchema      = require('./session'),
     SubscriptionSchema = require('./subscription');
+    MessageSchema      = require('./message');
 
 var UserSchema = new Schema({
     //_id
@@ -12,10 +13,8 @@ var UserSchema = new Schema({
 
     // embedded documents
     sessions: [SessionSchema.schema],
-    subscriptions: [SubscriptionSchema.schema]
-
-    // linked documents
-    // messages []
+    subscriptions: [SubscriptionSchema.schema],
+    messages: [MessageSchema.schema]
 })
 
 // UserSchema.virtual('usr').get(function() {

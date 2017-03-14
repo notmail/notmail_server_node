@@ -13,7 +13,7 @@ router.put('/', function(req, res, next) {
     let appref;
     let subref;
     Promise.resolve()
-    .then(()      => appmsgs.subPostCheck(req.body))                                // Validate request auth params       
+    .then(()      => appmsgs.subPostCheck(req.body))                                // Validate request params       
     .then(()      => appmsgs.checkAuthParams(req.query, true))                      // Validate request auth params       
     .then(()      => ApplicationSchema.authenticate(req.query, true))               // Check authentication
     .then(app     => reqtools.appCheckSecurity(req, app))                           // Check connection checkSecurity

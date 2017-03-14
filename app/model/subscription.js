@@ -4,11 +4,11 @@ var Schema   = mongoose.Schema,
     security = _require('util/security'),
     autoIncrement = require('mongoose-auto-increment');
 
-//autoIncrement.initialize(mongoose.connection);
+autoIncrement.initialize(mongoose.connection);
 
 var SubscriptionSchema = new Schema({
     //_id ('Number' autoIncremented)
-    _application: {type: mongoose.Schema.Types.ObjectId, ref: 'Application', required: true, unique: true},
+    _application: {type: mongoose.Schema.Types.ObjectId, ref: 'Application', required: true, unique: true, sparse: true},
     status: {type: String, default: 'pending'},
     validation: {type: String, required: true},
     created: {type: Date, default: Date.now()}
@@ -76,5 +76,5 @@ SubscriptionSchema.statics.requestFindSubscription = function(user, appid){
 }
 */
 
-//SubscriptionSchema.plugin(autoIncrement.plugin, 'Subscription');
+SubscriptionSchema.plugin(autoIncrement.plugin, 'Subscription');
 module.exports = mongoose.model('Subscription', SubscriptionSchema)

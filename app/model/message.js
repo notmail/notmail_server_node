@@ -1,34 +1,37 @@
-var mongoose = require('mongoose');  
-var Schema   = mongoose.Schema,
-    error    = _require('util/error'),
-    security = _require('util/security'),
+var mongoose      = require('mongoose');  
+var Schema        = mongoose.Schema,
+    error         = _require('util/error'),
+    security      = _require('util/security'),
     autoIncrement = require('mongoose-auto-increment');
 
 autoIncrement.initialize(mongoose.connection);
 
 var MessageSchema = new Schema({
     //_id ('Number' autoIncremented)
-    _subscription: {type: Number, ref: 'Subscription', required: true},
+    _sub: {type: Number, required: true},
     title: {type: String, required: true},
     data: String,
-    arrival_time: {type: Date, default: Date.now()},
+    arrival_time: {type: Date, required: true},
+
+    // Todavía no
+    type: String,
     deliver_time: Date,
     aler_time: Date,
     ack: Boolean
 })
 
-MessageSchema.statics.newMessage = function(message, subscription){
+MessageSchema.statics.newMessage = function(message, subscriptionId){
     try{
-        
         newmessage = new this();
         newmessage.data = message.data;
         newmessage.title = message.title;
-        newmessage.arrival_time = new Date(message.arrival_time);
-        newmessage.deliver_time = new Date(message.deliver_time);
+        if(message.arrival_time) newmessage.arrival_time = new Date(message.arrival_time);
+        if(message.deliver_time) newmessage.deliver_time = new Date(message.deliver_time);
         newmessage.ack = message.ack;
-        newmessage.subscription = subscription;
-
-        return message;
+        newmessage._sub = subscriptionId;
+        newmessage.arrival_time = Date.now();
+        //console.log(newmessage._sub)
+        return newmessage;
     }catch(e){
         throw new Error('error creating new message. ' + e.message);
     }
