@@ -65,7 +65,7 @@ ApplicationSchema.statics.authenticate = function(query, shared_key, root_secret
                 reject(new error.Unauthorized('Application does not exist'));
             })
         }catch(e){
-            console.log(e)
+            if (e.name == 'Security Error') reject(new error.Unauthorized('error during authentication'));
             reject(new error.Unknown('error during authentication'));
         }
     })

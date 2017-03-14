@@ -36,7 +36,7 @@ router.put('/', function(req, res, next) {
 
 // GET /app/sub (checkSubRequest)
 router.get('/', function(req, res, next) {
-    let appref;
+    let appref, subref;
     Promise.resolve()
     .then(()      => appmsgs.subGetCheck(req.query))                                // Validate request auth params       
     .then(()      => appmsgs.checkAuthParams(req.query, true))                      // Validate request auth params       
@@ -46,8 +46,9 @@ router.get('/', function(req, res, next) {
     .then(app     => {appref = app;                                                 // Get user data with subscriptions
                       return UserSchema.findUserByNotmail(req.query.user,'subscriptions')})
     .then(user    => {                                                              // Get subscription related to application
-                    try{ return user.retrieveSubscriptions(appref._id)[0] }
-                    catch(e){throw new error.Forbidden('no subscription found' +e.message)}})
+                    try{ subref = user.retrieveSubscriptions(appref._id)[0]; }
+                    catch(e){throw new error.Forbidden('no subscription found. '+e.message)}
+                    if(subref.status != 'subscribed') throw new error.Forbidden('subscription pending'); return subref;})
     .then(sub     => res.status(200).end())                                         // Send correct response   
     .catch(e      => {                                                              // Send error response      
         reqtools.errorHandler(e, res);

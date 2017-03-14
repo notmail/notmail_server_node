@@ -21,10 +21,10 @@ router.post('/', function(req, res, next) {
 
     .then(app     => {appref = app;                                                 // Get user data with subscriptions
                       return UserSchema.findUserByNotmail(req.body.dest.user,'subscriptions messages')})
-    .then(user    => {userref=user                                                  // Get associated subscription and check if subscribed
-                     try{           subref = user.retrieveSubscriptions(appref._id)[0]
-                                    if(subref.status != 'subscribed') throw new error.Forbidden('no subscription found')}
-                     catch(e){      throw new error.Forbidden('no subscription found' +e.message)}})
+    .then(user    => {userref=user                                                              // Get subscription related to application
+                    try{ subref = user.retrieveSubscriptions(appref._id)[0]; }
+                    catch(e){throw new error.Forbidden('no subscription found. '+e.message)}
+                    if(subref.status != 'subscribed') throw new error.Forbidden('subscription pending'); return subref;})
     .then( ()=>{                                                                    // Create and save message
         let msg = MessageSchema.newMessage(req.body.msg, subref._id)
         userref.messages.push(msg)
