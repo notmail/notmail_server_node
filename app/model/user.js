@@ -67,23 +67,23 @@ UserSchema.statics.findUserByNotmail = function(notmail, fields){
     })
 }
 
-UserSchema.methods.retrieveSubscriptions = function(applicationId, status){
-    if(!this.subscriptions) throw new error.SubscriptionError('No subscriptions field.')
-    let subscriptions = this.subscriptions;
+// UserSchema.methods.retrieveSubscriptions = function(applicationId, status){
+//     if(!this.subscriptions) throw new error.SubscriptionError('No subscriptions field.')
+//     let subscriptions = this.subscriptions;
 
-    if(applicationId){
-        subscriptions = subscriptions.filter(sub=>{
-            return (sub._application && (String(sub._application) == String(applicationId))) 
-        })
-    }
-    if(status){
-        subscriptions = subscriptions.filter(sub=>{
-            return sub.status == status;
-        })
-    }
-    if(subscriptions.length==0) throw new error.SubscriptionError('No subscriptions matched.')
-    return subscriptions;
-}
+//     if(applicationId){
+//         subscriptions = subscriptions.filter(sub=>{
+//             return (sub._application && (String(sub._application) == String(applicationId))) 
+//         })
+//     }
+//     if(status){
+//         subscriptions = subscriptions.filter(sub=>{
+//             return sub.status == status;
+//         })
+//     }
+//     if(subscriptions.length==0) throw new error.SubscriptionError('No subscriptions matched.')
+//     return subscriptions;
+// }
 
 UserSchema.methods.addSession = function(session){
     this.sessions.push(session);
@@ -111,6 +111,15 @@ UserSchema.statics.findSubscriptions = function(notmail, query, id){
             })
         })
 
+}
+
+UserSchema.statics.findSessions = function(notmail, token, all){
+    if(!all) match = { 'sessions.token': token };
+    return this.aggregate()
+        .match({notmail: notmail})
+        .project({sessions: 1})
+        .unwind('sessions')
+        .match(match)
 }
 
 
