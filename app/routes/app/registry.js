@@ -4,7 +4,8 @@ var router            = require('express').Router(),
     ApplicationSchema = _require('model/application'),
     reqtools          = _require('util/reqtools'),
     error             = _require('util/error'),
-    appmsgs           = require('./appmsgs.js');
+    appmsgs           = require('./appmsgs.js'),
+    authentication    = _require('/middleware/authentication');
 
 /**
  * Routing
@@ -14,52 +15,44 @@ router.post('/', function(req, res, next) {
     Promise.resolve(req.body)
     .then(appmsgs.registryPostCheck)                                                // Validate Request
     .then(()       => {return ApplicationSchema.newApplication(req.body)})          // Create an application instance
-    .then(newapp   => {return reqtools.appCheckSecurity(req, newapp)})              // Check connection checkSecurity
-    .then(newapp   => {return newapp.save()})                                       // Save new instance
+    .then(newapp   => {reqtools.appCheckSecurity(req, newapp);                      // Check connection checkSecurity and save new instance
+                       return newapp.save();})                                             
     .then(appmsgs.registryPostResponse)                                             // Create response from new data
     .then(response => {res.status(200).send(response)})                             // Send correct response                              
-    .catch(e => {                                                                   // Send error response      
-        reqtools.errorHandler(e, res);
-    })
+    .catch(e       => {reqtools.errorHandler(e, res);})                             // Send error response      
 })
+
+// Authentication Middleware
+router.use(authentication.applicationAuthenticate)                                  // Application credentials
+
 // GET /app/registry (infoApp)
 router.get('/', function(req, res, next) {
-    Promise.resolve()
-    .then(()       => {return appmsgs.checkAuthParams(req.query, true)})             // Validate request auth params       
-    .then(()       => {return ApplicationSchema.authenticate(req.query, true)})      // Check authentication
-    .then(app      => {return reqtools.appCheckSecurity(req, app)})                  // Check connection checkSecurity
-    .then(app      => {return app.save()})                                           // Save changes
+    Promise.resolve(req.app)
     .then(appmsgs.registryGetResponse)                                               // Use data from DB to forge response
     .then(response => {res.status(200).send(response)})                              // Send correct response                              
-    .catch(e       => {                                                              // Send error response      
-        reqtools.errorHandler(e, res);
-    })
+    .catch(e       => {reqtools.errorHandler(e, res);})                              // Send error response      
 })
+
 // PUT /app/registry (registerApp)
 router.put('/', function(req, res, next) {
     Promise.resolve()
-    .then(()      => {return appmsgs.checkAuthParams(req.query, true, true)})       // Validate request auth params       
-    .then(()      => {return ApplicationSchema.authenticate(req.query, true, true)})// Check authentication
-    .then(app     => {return reqtools.appCheckSecurity(req, app)})                  // Check connection checkSecurity
-    //.then(app   => {return app.save()})                                           // Save changes
-    .then(app     => {return ApplicationSchema.updateApplication(app, req.body)})   // Prepare updates        
-    .then(updated => {return updated.save()})                                       // Save changes
-    .then(appmsgs.registryPutResponse)                                              // Prepare response
-    .then(data    => {res.status(200).send(data)})                                  // Send correct response   
-    .catch(e      => {                                                              // Send error response      
-        reqtools.errorHandler(e, res);
-    })
+    .then(()      => {appmsgs.checkAuthParams(req.query, false, true)                // Validate request auth params (root secret)
+                      if(req.app.root_secret!=req.query.root_secret) throw new error.Forbidden('Wrong root_secret')})
+    .then(app     => {return ApplicationSchema.updateApplication(req.app, req.body)})// Prepare updates        
+    .then(updated => {return updated.save()})                                        // Save changes
+    .then(appmsgs.registryPutResponse)                                               // Prepare response
+    .then(data    => {res.status(200).send(data)})                                   // Send correct response   
+    .catch(e      => {reqtools.errorHandler(e, res);})                               // Send error response      
 })
+
 // DEL /app/registry (deleteApp)
 router.delete('/', function(req, res, next) {
     Promise.resolve()
-    .then(()      => {return appmsgs.checkAuthParams(req.query, true, true)})       // Validate request auth params       
-    .then(()      => {return ApplicationSchema.authenticate(req.query, true, true)})// Check authentication
-    .then(app     => {return app.remove();})                                        // Save app changes
+    .then(()      => {appmsgs.checkAuthParams(req.query, false, true)                // Validate request auth params (root secret)
+                      if(req.app.root_secret!=req.query.root_secret) throw new error.Forbidden('Wrong root_secret')})
+    .then(app     => {return req.app.remove();})                                    // Save app changes
     .then(data    => {res.status(200).end()})                                       // Send correct response   
-    .catch(e      => {                                                              // Send error response      
-        reqtools.errorHandler(e, res);
-    })
+    .catch(e      => {reqtools.errorHandler(e, res);})                              // Send error response      
 })
 
 /* Module settings */

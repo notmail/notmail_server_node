@@ -5,8 +5,11 @@ function checkSecurity(req){
 }
 
 function appCheckSecurity(req, app){
-    app.unsecured_source = checkSecurity(req);
-    return app;
+    if(app.unsecured_source == false && !req.connection.encrypted){
+        app.unsecured_source = true;
+        return true;
+    }
+    else return false;
 }
 
 function res_err(res, status, code, msg){

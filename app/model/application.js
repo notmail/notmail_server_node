@@ -13,8 +13,6 @@ var ApplicationSchema = new Schema({
     url: String,
     icon: String,
     unsecured_source: { type: Boolean, required: true },
-    
-    unique_id: { type: String, required: true },
 
     // Auto
     created: { type: Date, default: Date.now },
@@ -22,24 +20,18 @@ var ApplicationSchema = new Schema({
     last_event: { type: Date, default: Date.now }
 })
 
-// ApplicationSchema.virtual('unique_id').get(function() {
-//     try{
-//         return security.encrypt(this._id, passwords.application_pwd)
-//     }catch(e){
-//         console.log(e);
-//         return -1;
-//     }
-// });
+ApplicationSchema.virtual('unique_id').get(function() {
+    return this._id;
+});
 
 ApplicationSchema.statics.newApplication = function(body){
     try{
         newapp = new this();
         newapp.title = body.app.title; //#*
         newapp.description = body.app.description; //#
+        newapp.unsecured_source = false;
         newapp.url = body.app.url; //#
         newapp.icon = body.app.icon; //#
-
-        newapp.unique_id = security.hashText(newapp._id);
         newapp.shared_key = security.genRandomKey(); //*
         newapp.root_secret = security.genRandomKey(); //*
         return newapp;
@@ -52,10 +44,7 @@ ApplicationSchema.statics.authenticate = function(query, shared_key, root_secret
     var self = this;
     return new Promise(function (resolve, reject) {
         try{
-            //var _id;
-            //_id = security.decrypt(query.unique_id, passwords.application_pwd)
-            
-            self.findOne({unique_id: query.unique_id}).exec()
+            self.findById(query.unique_id).exec()
             .then(app=>{
                 if(shared_key && query.shared_key != app.shared_key)
                     reject(new error.Unauthorized('Wrong shared_key'));

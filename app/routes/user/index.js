@@ -3,10 +3,10 @@ var express = require('express'),
     authentication = _require('/middleware/authentication');
 
 /* Routes */
-router.use('/auth', require('./auth'))  // Auth (get token)
-router.use(authentication.tokenAuthenticate)  // TokenAuthentication
-router.use('/sub', require('./sub'))    // Subscriptions
-router.use('/msg', require('./msg'))    // Messages
+router.use('/auth', require('./auth'))          // Auth (get token)
+router.use(authentication.tokenAuthenticate)    // TokenAuthentication
+router.use('/sub', require('./sub'))            // Subscriptions
+router.use('/msg', require('./msg'))            // Messages
 
 /* Logic  */
 router.get('/', function(req, res, next) {
