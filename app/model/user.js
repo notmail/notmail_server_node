@@ -113,6 +113,18 @@ UserSchema.statics.findSubscriptions = function(notmail, query, id){
         })
 }
 
+// UserSchema.statics.editSubscription = function(notmail, sub, op){
+
+    
+
+//     // return this.aggregate()
+//     //     .match({notmail: notmail})
+//     //     .project({subscriptions: 1})
+//     //     .unwind('subscriptions')
+//     //     .match({ 'subscriptions.sub': sub })
+
+// }
+
 UserSchema.statics.findSessions = function(notmail, token, all){
     if(!all) match = { 'sessions.token': token };
     return this.aggregate()

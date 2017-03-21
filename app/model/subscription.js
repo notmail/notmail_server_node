@@ -58,6 +58,13 @@ SubscriptionSchema.methods.reset = function(){
     }
 }
 
+SubscriptionSchema.statics.updateSubscription = function(notmail, sub, op){
+
+    //return //this.find({sub: '$2a$10$zqrxTLkdGNPVfBQlDKQGpetG3ssOQK7c4V197otsY1Ytbe6N66S0a'})
+    //return this.findById(mongoose.Types.ObjectId('58d1642dd31e5bc5d8810395'))
+    .exec()
+
+}
 
 /*
 SubscriptionSchema.statics.requestFindSubscription = function(user, appid){
