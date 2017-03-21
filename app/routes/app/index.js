@@ -1,8 +1,14 @@
 var express = require('express'),
-    router = express.Router();
+    router = express.Router(),
+    authentication    = _require('/middleware/authentication'),
+    destination    = _require('/middleware/destination');
 
 /* Routes */
 router.use('/registry', require('./registry'))
+
+router.use(authentication.applicationAuthenticate)                                  // Application credentials
+router.use(destination)                                  // Destination middleware
+
 router.use('/sub', require('./sub'))
 router.use('/msg', require('./msg'))
 

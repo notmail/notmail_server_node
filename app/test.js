@@ -47,7 +47,7 @@ ApplicationSchema = require('./model/application');
 
 user = UserSchema.newUser({
     notmail: 'jaime@ehu.es',
-    pwd: '123412341234'
+    pwd: '1234'
 })
 user.save()
 .then(user=>{console.log('created! ' + JSON.stringify(user))})

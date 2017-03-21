@@ -2,24 +2,59 @@ var mongoose = require('mongoose');
 var Schema   = mongoose.Schema,
     error    = _require('util/error'),
     security = _require('util/security');
+    UserSchema = require('./user');
     //autoIncrement = require('mongoose-auto-increment');
 
 //autoIncrement.initialize(mongoose.connection);
 
 var SubscriptionSchema = new Schema({
     //_id ('Number' )
-    app: {type: mongoose.Schema.Types.ObjectId, ref: 'Application', required: true, unique: true, sparse: true},
+    app: {type: mongoose.Schema.Types.ObjectId, ref: 'Application', required: true},
+    user: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true},
+
     status: {type: String, default: 'pending'},
     validation: {type: String, required: true},
     created: {type: Date, default: Date.now()},
-    
-    sub: {type: String, required: true},
 })
 
-// SubscriptionSchema.virtual('id').get(function() {
-//     return this._id;
-// });
+SubscriptionSchema.virtual('sub').get(function() {
+    return this._id;
+});
 
+SubscriptionSchema.statics.newSubscription = function(appref, userref){
+    try{
+        newsubscription = new this();
+        newsubscription.status = 'pending';
+        newsubscription.validation = security.genRandomValidation();
+        
+        newsubscription.app = appref;
+        newsubscription.user = userref;
+        //newsubscription.sub = security.hashText(this._id)
+        return newsubscription;
+    }catch(e){
+        throw new Error('error creating new subscription. ' + e.message);
+    }
+}
+
+SubscriptionSchema.statics.getAppUserSubscriptions = function(appref, userref){
+    return this.findOne({app: appref, user: userref})
+}
+
+SubscriptionSchema.methods.reset = function(){
+    try{
+        this.status = 'pending',
+        this.validation = security.genRandomValidation()
+        this.created = Date.now();
+        return this;
+    }catch(e){
+        throw new Error('error reseting subscription. ' + e.message);
+    }
+}
+
+
+
+
+//////////////////////////
 SubscriptionSchema.methods.getApplication = function(){
     var self = this;
     return new Promise(function (resolve, reject) {
@@ -34,29 +69,8 @@ SubscriptionSchema.methods.getApplication = function(){
     })
 }
 
-SubscriptionSchema.statics.newSubscription = function(application){
-    try{
-        newsubscription = new this();
-        newsubscription.status = 'pending';
-        newsubscription.validation = security.genRandomValidation();
-        
-        newsubscription._application = application;
-        newsubscription.sub = security.hashText(this._id)
-        return newsubscription;
-    }catch(e){
-        throw new Error('error creating new subscription. ' + e.message);
-    }
-}
-SubscriptionSchema.methods.reset = function(){
-    try{
-        this.status = 'pending',
-        this.validation = security.genRandomValidation()
-        this.created = Date.now();
-        return this;
-    }catch(e){
-        throw new Error('error reseting subscription. ' + e.message);
-    }
-}
+
+
 
 SubscriptionSchema.statics.updateSubscription = function(notmail, sub, op){
 

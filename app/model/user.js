@@ -15,7 +15,7 @@ var UserSchema = new Schema({
 
     // embedded documents
     sessions: [SessionSchema.schema],
-    subscriptions: [SubscriptionSchema.schema],
+    //subscriptions: [SubscriptionSchema.schema],
     messages: [MessageSchema.schema]
 })
 
@@ -23,6 +23,26 @@ var UserSchema = new Schema({
 //     return this._id;
 // });
 
+
+UserSchema.statics.findUserByNotmail = function(notmail, fields){
+    var self = this;
+    return new Promise(function (resolve, reject) {
+        self.findOne({ 'notmail': notmail }/*, fields*/).exec()
+        .then(user=>{
+            if(!user) reject(new error.Forbidden('Not such user'))
+            resolve(user)
+        })
+        .catch(e=>{
+            reject(new error.Forbidden('Not such user'))
+        })
+    })
+}
+
+
+
+
+
+/////////////
 UserSchema.statics.newUser = function(user){
     try{
         newuser = new this();
@@ -53,7 +73,7 @@ UserSchema.statics.authenticate = function(notmail, password){
     })
 }
 
-UserSchema.statics.findUserByNotmail = function(notmail, fields){
+UserSchema.statics.findUserByNotmail2 = function(notmail, fields){
     var self = this;
     return new Promise(function (resolve, reject) {
         self.findOne({ 'notmail': notmail }, fields).exec()

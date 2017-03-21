@@ -12,6 +12,17 @@ exports.checkAuthParams = function(params, shared_key, root_secret){
         throw new error.BadRequest('root_secret missing');
 }
 
+exports.checkDestination = function(query, body){
+    let dest = null;
+    if(body.dest && body.dest.user)
+        dest = body.dest.user;
+    else if(query.user)
+        dest = query.user
+    if(dest==null)
+        throw new error.BadRequest('user missing');
+    return dest;
+}
+
 /**
  *      /app/registry
  */
@@ -59,18 +70,18 @@ exports.registryPutResponse = function(app){
 /**
  *      /app/sub
  */
-exports.subPostCheck = function(body){
-    if(!body.dest)
-        throw new error.BadRequest('dest missing');
-    if(!body.dest.user)
-        throw new error.BadRequest('user missing');
-    return body
-}
+// exports.subPutCheck = function(body){
+//     if(!body.dest)
+//         throw new error.BadRequest('dest missing');
+//     if(!body.dest.user)
+//         throw new error.BadRequest('user missing');
+//     return body
+// }
 
-exports.subGetCheck = function(params){
-    if(!params.user)
-        throw new error.BadRequest('user param missing');
-}
+// exports.subGetCheck = function(params){
+//     if(!params.user)
+//         throw new error.BadRequest('user param missing');
+// }
 
 exports.subPutResponse = function(sub){
     let response = {

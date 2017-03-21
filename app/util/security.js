@@ -61,7 +61,7 @@ function genRandomValidation(){
 */
 function hashPassword(pwd){
     try{
-        if(pwd.length < 8) throw new Error('Password too short')
+        if(pwd.length < 4) throw new Error('Password too short')
         return bcrypt.hashSync(pwd, 10);
     }catch (e){
         throw new error.AuthenticationFailure('Failed to create password hash.' + e.message)
