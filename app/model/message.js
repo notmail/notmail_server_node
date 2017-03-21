@@ -10,6 +10,7 @@ var MessageSchema = new Schema({
     //_id ('Number' autoIncremented)
     _sub: {type: Number, required: true},
     title: {type: String, required: true},
+    type: {type: String, default: 'text'},
     data: String,
     arrival_time: {type: Date, required: true},
 

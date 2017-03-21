@@ -3,8 +3,10 @@ var Schema             = mongoose.Schema,
     error              = _require('util/error'),
     security           = _require('util/security'),
     SessionSchema      = require('./session'),
-    SubscriptionSchema = require('./subscription');
-    MessageSchema      = require('./message');
+    SubscriptionSchema = require('./subscription'),
+    MessageSchema      = require('./message'),
+    security = _require('/util/security'),
+    config = _require('/../config');
 
 var UserSchema = new Schema({
     //_id
@@ -35,11 +37,15 @@ UserSchema.statics.newUser = function(user){
 UserSchema.statics.authenticate = function(notmail, password){
     var self = this;
     return new Promise(function (resolve, reject) {
-        this.findOne({ 'notmail': notmail }, 'pwd').exec()
+        self.findOne({ 'notmail': notmail }, 'pwd sessions').exec()
         .then(user=>{
-            if (user.pwd === password) resolve(user)
-            else
+            try{
+                security.testPassword(password, user.pwd);
+                resolve(user);
+
+            }catch(e){
                 reject(new error.AuthenticationFailure('Wrong password'))
+            }
         })
         .catch(e=>{
             reject(new error.AuthenticationFailure('Not such user'))
@@ -82,5 +88,30 @@ UserSchema.methods.retrieveSubscriptions = function(applicationId, status){
 UserSchema.methods.addSession = function(session){
     this.sessions.push(session);
 }
+
+
+UserSchema.statics.findSubscriptions = function(notmail, query, id){
+    
+    let match = {};
+    if(query === 'app')
+        match['subscriptions._id'] = id;
+    else if(query === 'pending' || query === 'subscribed')
+        match['subscriptions.status'] = query;
+
+    return this.aggregate()
+        .match({notmail: notmail})
+        .project({subscriptions: 1})
+        .unwind('subscriptions')
+        .match(match)
+        .group({"_id": "$_id", "subscriptions": { "$push": "$subscriptions" }} )
+        .then(result=>{
+            return this.populate(result, {
+                path: 'subscriptions._application',
+                select: '-_id title description url icon unsecured_source'
+            })
+        })
+
+}
+
 
 module.exports = mongoose.model('User', UserSchema)

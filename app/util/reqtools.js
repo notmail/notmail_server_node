@@ -1,6 +1,4 @@
-var error = require('./error'),
-    ApplicationSchema = _require('model/application');
-
+var error             = require('./error');
 
 function checkSecurity(req){
     return !req.connection.encrypted
@@ -18,9 +16,8 @@ function res_err(res, status, code, msg){
     err.error.status = status;
     err.error.code = code;
     err.error.msg = msg;
-    res.status(status).send(err);
+    res.status(status).send(err).end();
 }
-
 
 function errorHandler(e, res){
     try{                          
@@ -30,9 +27,11 @@ function errorHandler(e, res){
             res_err(res, 401, e.name, e.message)
         if(e.name === 'Forbidden')
             res_err(res, 403, e.name, e.message)
+        if(e.name === 'Authentication Failure')
+            res_err(res, 401, e.name, e.message)
         else{
             res.status(500).end();
-            console.log(e)
+            console.log('else error'+e)
         }
     }catch(e) {
         console.log('fatal error:' + e)

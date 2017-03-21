@@ -70,11 +70,25 @@ function hashPassword(pwd){
 
 function testPassword(pwd, hashed){
     try{
-        if(!bcrypt.compareSync(pws, hashed)) throw new Error('Wrong Password')
+        if(!bcrypt.compareSync(pwd, hashed)) throw new Error('Wrong Password')
     }catch (e){
         throw new error.AuthenticationFailure('Failed to test password. ' + e.message)
     }
 }
+
+
+/*
+    ## Hasing password ## 
+    - For user password storage and check
+*/
+function hashText(text){
+    try{
+        return bcrypt.hashSync(String(text), 10);
+    }catch (e){
+        throw new error.AuthenticationFailure('Failed to create hash.' + e.message)
+    }
+}
+
 
 
 module.exports = {
@@ -83,5 +97,6 @@ module.exports = {
     testPassword: testPassword,
     encrypt: encrypt,
     decrypt: decrypt,
-    genRandomValidation: genRandomValidation
+    genRandomValidation: genRandomValidation,
+    hashText: hashText
 }
