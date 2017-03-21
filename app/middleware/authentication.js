@@ -8,11 +8,13 @@ var usermsgs          = _require('/routes/user/usermsgs'),
 module.exports = {};
 
 module.exports.tokenAuthenticate = function(req, res, then){
-    req.notmail = req.query.token.split('_')[0];
-    req.token = req.query.token.split('_')[1];
 
     Promise.resolve()
-    .then(()=>usermsgs.checkAuthParams(req.query))
+    .then(()=>{
+        let netToken = usermsgs.checkAuthParams(req.query);
+        req.notmail = netToken[0];
+        req.token = netToken[1];
+    })
     .then(()=>{return UserSchema.findSessions(req.notmail, req.token)})
     .then(session=>{
         if(session.length != 1) throw new error.Unauthorized('Wrong Session');

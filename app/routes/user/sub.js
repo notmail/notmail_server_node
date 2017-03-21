@@ -11,7 +11,18 @@ var express = require('express'),
 // GET /user/sub (getSubscriptions)
 router.get('/', function(req, res, next) {
 
-    UserSchema.findSubscriptions(req.notmail, req.query.query)
+    UserSchema.findSubscriptions(req.notmail, req.query.query, req.query.sub)
+    .then(data=>{return usermsgs.subGetResponse(data)})
+    .then(response => {res.status(200).send(response)})                             // Send correct response
+    .catch(e => {                                                                   // Send error response      
+        reqtools.errorHandler(e, res);
+    })
+})
+
+// PUT /user/sub (getSubscriptions)
+router.put('/', function(req, res, next) {
+
+    UserSchema.findSubscriptions(req.notmail, req.query.query, req.query.sub)
     .then(data=>{return usermsgs.subGetResponse(data)})
     .then(response => {res.status(200).send(response)})                             // Send correct response
     .catch(e => {                                                                   // Send error response      

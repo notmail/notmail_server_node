@@ -1,7 +1,7 @@
 /* Imports */
 var mongoose = require('mongoose'),
-    Promise = require('bluebird'),
-    autoIncrement = require('mongoose-auto-increment');
+    Promise = require('bluebird');
+    //autoIncrement = require('mongoose-auto-increment');
 
 /* Setup */
 mongoose.Promise = Promise;

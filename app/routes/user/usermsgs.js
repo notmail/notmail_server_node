@@ -7,6 +7,10 @@ var error = _require('./util/error')
 exports.checkAuthParams = function(params){
     if(!params.token)
         throw new error.BadRequest('token missing');
+    let netToken = params.token.split('_');
+    if(netToken.length != 2)
+        throw new error.BadRequest('bad token');
+    return netToken;
 }
 
 /**
@@ -33,17 +37,18 @@ exports.authGetResponse = function(notmail, session){
 /**
  *      /user/sub
  */
-exports.subGetCheck = function(query){
-    if(!query.notmail)
-        throw new error.BadRequest('notmail missing');
-    if(!query.pwd)
-        throw new error.BadRequest('pwd missing');
+exports.subGetCheck = function(query){          // HAY QUE METER ESTO
+    if(query.query && ['all, pending, subscribed, app'])
+        throw new error.BadRequest('query error');
+    if(query.query && query.query == 'app' && !query.sub)
+        throw new error.BadRequest('no sub specified');
+
     return query;
 }
 
 exports.subGetResponse = function(result){
     var response = {
-        subs: result[0].subscriptions
+        subs: (result.length>0)? result[0].subscriptions : []
     }
     return response;
 }

@@ -1,18 +1,24 @@
 var mongoose = require('mongoose');  
 var Schema   = mongoose.Schema,
     error    = _require('util/error'),
-    security = _require('util/security'),
-    autoIncrement = require('mongoose-auto-increment');
+    security = _require('util/security');
+    //autoIncrement = require('mongoose-auto-increment');
 
-autoIncrement.initialize(mongoose.connection);
+//autoIncrement.initialize(mongoose.connection);
 
 var SubscriptionSchema = new Schema({
-    //_id ('Number' autoIncremented)
-    _application: {type: mongoose.Schema.Types.ObjectId, ref: 'Application', required: true, unique: true, sparse: true},
+    //_id ('Number' )
+    app: {type: mongoose.Schema.Types.ObjectId, ref: 'Application', required: true, unique: true, sparse: true},
     status: {type: String, default: 'pending'},
     validation: {type: String, required: true},
-    created: {type: Date, default: Date.now()}
+    created: {type: Date, default: Date.now()},
+    
+    sub: {type: String, required: true},
 })
+
+// SubscriptionSchema.virtual('id').get(function() {
+//     return this._id;
+// });
 
 SubscriptionSchema.methods.getApplication = function(){
     var self = this;
@@ -33,7 +39,9 @@ SubscriptionSchema.statics.newSubscription = function(application){
         newsubscription = new this();
         newsubscription.status = 'pending';
         newsubscription.validation = security.genRandomValidation();
+        
         newsubscription._application = application;
+        newsubscription.sub = security.hashText(this._id)
         return newsubscription;
     }catch(e){
         throw new Error('error creating new subscription. ' + e.message);
@@ -76,5 +84,5 @@ SubscriptionSchema.statics.requestFindSubscription = function(user, appid){
 }
 */
 
-SubscriptionSchema.plugin(autoIncrement.plugin, 'Subscription');
+//SubscriptionSchema.plugin(autoIncrement.plugin, 'Subscription');
 module.exports = mongoose.model('Subscription', SubscriptionSchema)

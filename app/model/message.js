@@ -1,13 +1,13 @@
 var mongoose      = require('mongoose');  
 var Schema        = mongoose.Schema,
     error         = _require('util/error'),
-    security      = _require('util/security'),
-    autoIncrement = require('mongoose-auto-increment');
+    security      = _require('util/security');
+    //autoIncrement = require('mongoose-auto-increment');
 
-autoIncrement.initialize(mongoose.connection);
+//autoIncrement.initialize(mongoose.connection);
 
 var MessageSchema = new Schema({
-    //_id ('Number' autoIncremented)
+    //_id ('Number' )
     _sub: {type: Number, required: true},
     title: {type: String, required: true},
     type: {type: String, default: 'text'},
@@ -38,5 +38,5 @@ MessageSchema.statics.newMessage = function(message, subscriptionId){
     }
 }
 
-MessageSchema.plugin(autoIncrement.plugin, 'Message');
+//MessageSchema.plugin(autoIncrement.plugin, 'Message');
 module.exports = mongoose.model('Message', MessageSchema)

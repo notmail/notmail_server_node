@@ -67,23 +67,24 @@ UserSchema.statics.findUserByNotmail = function(notmail, fields){
     })
 }
 
-// UserSchema.methods.retrieveSubscriptions = function(applicationId, status){
-//     if(!this.subscriptions) throw new error.SubscriptionError('No subscriptions field.')
-//     let subscriptions = this.subscriptions;
+/// Esta función habría que sustituirla por algo más óptimo.
+UserSchema.methods.retrieveSubscriptions = function(applicationId, status){
+    if(!this.subscriptions) throw new error.SubscriptionError('No subscriptions field.')
+    let subscriptions = this.subscriptions;
 
-//     if(applicationId){
-//         subscriptions = subscriptions.filter(sub=>{
-//             return (sub._application && (String(sub._application) == String(applicationId))) 
-//         })
-//     }
-//     if(status){
-//         subscriptions = subscriptions.filter(sub=>{
-//             return sub.status == status;
-//         })
-//     }
-//     if(subscriptions.length==0) throw new error.SubscriptionError('No subscriptions matched.')
-//     return subscriptions;
-// }
+    if(applicationId){
+        subscriptions = subscriptions.filter(sub=>{
+            return (sub._application && (String(sub._application) == String(applicationId))) 
+        })
+    }
+    if(status){
+        subscriptions = subscriptions.filter(sub=>{
+            return sub.status == status;
+        })
+    }
+    if(subscriptions.length==0) throw new error.SubscriptionError('No subscriptions matched.')
+    return subscriptions;
+}
 
 UserSchema.methods.addSession = function(session){
     this.sessions.push(session);
@@ -91,26 +92,25 @@ UserSchema.methods.addSession = function(session){
 
 
 UserSchema.statics.findSubscriptions = function(notmail, query, id){
-    
     let match = {};
     if(query === 'app')
-        match['subscriptions._id'] = id;
+        match['subscriptions.sub'] = id;
     else if(query === 'pending' || query === 'subscribed')
         match['subscriptions.status'] = query;
-
+        console.log(match)
     return this.aggregate()
         .match({notmail: notmail})
         .project({subscriptions: 1})
         .unwind('subscriptions')
         .match(match)
+        .project({'subscriptions._id': 0})
         .group({"_id": "$_id", "subscriptions": { "$push": "$subscriptions" }} )
         .then(result=>{
             return this.populate(result, {
-                path: 'subscriptions._application',
+                path: 'subscriptions.app',
                 select: '-_id title description url icon unsecured_source'
             })
         })
-
 }
 
 UserSchema.statics.findSessions = function(notmail, token, all){
