@@ -14,12 +14,19 @@ var SubscriptionSchema = new Schema({
 
     status: {type: String, default: 'pending'},
     validation: {type: String, required: true},
-    created: {type: Date, default: Date.now()},
-})
+    created: {type: Date, default: Date.now()}
+/*, { toObject: { virtuals: true ,toJSON: { virtuals: true }} */})
 
-SubscriptionSchema.virtual('sub').get(function() {
-    return this._id;
-});
+SubscriptionSchema.set('toJSON', {
+    transform: function(doc, ret, options) {
+        return {
+            sub: ret._id,
+            status: ret.status,
+            validation: ret.validation
+        }
+    },
+    virtuals: true
+})
 
 SubscriptionSchema.statics.newSubscription = function(appref, userref){
     try{
@@ -38,6 +45,15 @@ SubscriptionSchema.statics.newSubscription = function(appref, userref){
 
 SubscriptionSchema.statics.getAppUserSubscriptions = function(appref, userref){
     return this.findOne({app: appref, user: userref})
+    .catch(e=>{
+        throw new error.BadRequest('bad subscription')
+    })
+}
+SubscriptionSchema.statics.getSubUserSubscription = function(subref, userref){
+    return this.findOne({_id: subref, user: userref})
+    .catch(e=>{
+        throw new error.BadRequest('bad subscription')
+    })
 }
 
 SubscriptionSchema.methods.reset = function(){
@@ -52,7 +68,16 @@ SubscriptionSchema.methods.reset = function(){
 }
 
 
+SubscriptionSchema.statics.getUserSubscriptions = function(userId, query, sub){
+    let match = { user: userId };
+    //let select = {}//{ validation: 1, status: 1, sub: 1, _id: 0 }
+    if(query === 'app')
+        match._id = sub;
+    else if(query === 'pending' || query === 'subscribed')
+        match.status = query;
 
+    return this.find(match)//, select)
+}
 
 //////////////////////////
 SubscriptionSchema.methods.getApplication = function(){

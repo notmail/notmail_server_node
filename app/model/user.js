@@ -14,7 +14,7 @@ var UserSchema = new Schema({
     pwd: { type: String, required: true},
 
     // embedded documents
-    sessions: [SessionSchema.schema],
+    //sessions: [SessionSchema.schema],
     //subscriptions: [SubscriptionSchema.schema],
     messages: [MessageSchema.schema]
 })

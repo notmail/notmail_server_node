@@ -26,7 +26,7 @@ exports.authGetCheck = function(query){
 
 exports.authGetResponse = function(notmail, session){
     var response = {
-        token: notmail + '_' + session.token,
+        token: session.token,
         expiration: session.expiration,
         subs: session.subs,
         permissions: session.permissions
@@ -48,7 +48,7 @@ exports.subGetCheck = function(query){          // HAY QUE METER ESTO
 
 exports.subGetResponse = function(result){
     var response = {
-        subs: (result.length>0)? result[0].subscriptions : []
+        subs: result//(result.length>0)? result[0].subscriptions : []
     }
     return response;
 }

@@ -16,15 +16,11 @@ router.get('/', function(req, res, next) {
     .then(usermsgs.authGetCheck)                                                    // Check request params
     .then(()=>{return UserSchema.authenticate(req.query.notmail, req.query.pwd)})   // Authenticate user
     .then(user=>{                                                                   // Create new session and save it
-        sessionref = SessionSchema.newSession(req.query);
-        user.addSession(sessionref);
-        user.markModified('sessions')
-        return user.save()})
-    .then(()=>{return usermsgs.authGetResponse(req.query.notmail, sessionref)})                        // Create response message
+        return SessionSchema.newSession(user._id, req.query).save()})
+    .then((session)=>{return usermsgs.authGetResponse(req.query.notmail, session)})                        // Create response message
     .then(response => {res.status(200).send(response)})                             // Send correct response
-    .catch(e => {                                                                   // Send error response      
-        reqtools.errorHandler(e, res);
-    })
+    .catch(e       => {reqtools.errorHandler(e, res);})                             // Send error response      
+
 })
 
 

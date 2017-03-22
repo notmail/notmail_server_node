@@ -6,6 +6,7 @@ var usermsgs          = _require('/routes/user/usermsgs'),
     error             = _require('/util/error'),
     appmsgs           = _require('/routes/app/appmsgs.js'),
     ApplicationSchema = _require('model/application');
+    SessionSchema     = _require('model/session');
 
 module.exports = {};
 
@@ -24,16 +25,13 @@ module.exports.applicationAuthenticate = function(req, res, then){
 module.exports.tokenAuthenticate = function(req, res, then){
 
     Promise.resolve()
-    .then(()=>{
-        let netToken = usermsgs.checkAuthParams(req.query);
-        req.notmail = netToken[0];
-        req.token = netToken[1];
+    .then(()=>{return usermsgs.checkAuthParams(req.query) })
+    .then((token)=>{
+        return SessionSchema.findSession(token[0], token[1])
     })
-    .then(()=>{return UserSchema.findSessions(req.notmail, req.token)})
     .then(session=>{
-        if(session.length != 1) throw new error.Unauthorized('Wrong Session');
         req.session = session;
-        then();
+        then()
     })
     .catch(e => {                                                                   // Send error response      
         reqtools.errorHandler(e, res);
