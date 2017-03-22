@@ -11,30 +11,18 @@ var router             = require('express').Router(),
 
 // POST /app/msg (newMessage)
 router.post('/', function(req, res, next) {
-    let appref, subref, userref;
+    let subref;
     Promise.resolve()
-    .then(()      => appmsgs.msgPostCheck(req.body))                                // Validate request params       
-    .then(()      => appmsgs.checkAuthParams(req.query, true))                      // Validate request auth params       
-    .then(()      => ApplicationSchema.authenticate(req.query, true))               // Check authentication
-    .then(app     => reqtools.appCheckSecurity(req, app))                           // Check connection checkSecurity
-    .then(app     => app.save())                                                    // Save changes
-
-    .then(app     => {appref = app;                                                 // Get user data with subscriptions
-                      return UserSchema.findUserByNotmail(req.body.dest.user,'subscriptions messages')})
-    .then(user    => {userref=user                                                              // Get subscription related to application
-                    try{ subref = user.retrieveSubscriptions(appref._id)[0]; }
-                    catch(e){throw new error.Forbidden('no subscription found. '+e.message)}
-                    if(subref.status != 'subscribed') throw new error.Forbidden('subscription pending'); return subref;})
-    .then( ()=>{                                                                    // Create and save message
-        let msg = MessageSchema.newMessage(req.body.msg, subref._id)
-        userref.messages.push(msg)
-        userref.markModified('messages')
-        userref.save();
-    })
-    .then(response=> res.status(200).end())                                         // Send correct response   
-    .catch(e      => {                                                              // Send error response      
-        reqtools.errorHandler(e, res);
-    })
+    .then(()    =>appmsgs.msgPostCheck(req.body))
+    .then(()    =>{return SubscriptionSchema.getAppUserSubscriptions(req.app._id, req.user._id)})
+    .then(sub   =>{if (!sub)
+                        throw new error.Forbidden('no subscription found')
+                   else if(sub.status == 'pending' || sub.status == 'unsubscribed')
+                        throw new error.Forbidden('subscription '+ sub.status)
+                   else if(sub.status == 'subscribed') 
+                        return MessageSchema.newMessage(req.body.msg, sub._id, req.user._id).save();})
+    .then(()=> res.status(200).end())                                // Send correct response
+    .catch(e       => {reqtools.errorHandler(e, res);})                             // Send error response      
 })
 
 /* Module settings */

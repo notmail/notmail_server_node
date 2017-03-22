@@ -12,17 +12,7 @@ var UserSchema = new Schema({
     //_id
     notmail: { type: String, required: true, unique: true },
     pwd: { type: String, required: true},
-
-    // embedded documents
-    //sessions: [SessionSchema.schema],
-    //subscriptions: [SubscriptionSchema.schema],
-    messages: [MessageSchema.schema]
 })
-
-// UserSchema.virtual('usr').get(function() {
-//     return this._id;
-// });
-
 
 UserSchema.statics.findUserByNotmail = function(notmail, fields){
     var self = this;

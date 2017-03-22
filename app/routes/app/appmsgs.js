@@ -96,11 +96,6 @@ exports.subPutResponse = function(sub){
  *      /app/sub
  */
 exports.msgPostCheck = function(body){
-    if(!body.dest)
-        throw new error.BadRequest('dest missing');
-    if(!body.dest.user)
-        throw new error.BadRequest('user missing');
-
     if(!body.msg)
         throw new error.BadRequest('msg missing');
     if(!body.msg.data)

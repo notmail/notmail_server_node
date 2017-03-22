@@ -13,7 +13,7 @@ var SubscriptionSchema = new Schema({
     user: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true},
 
     status: {type: String, default: 'pending'},
-    validation: {type: String, required: true},
+    validation: {type: String, required: false},
     created: {type: Date, default: Date.now()}
 /*, { toObject: { virtuals: true ,toJSON: { virtuals: true }} */})
 

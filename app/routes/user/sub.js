@@ -25,6 +25,7 @@ router.put('/', function(req, res, next) {
         if(!sub) new error.BadRequest('No such subscription')
         if(req.query.op == 'subscribe'){
             sub.status = 'subscribed';
+            sub.validation = undefined;
             sub.save();
         }else if (req.query.op == 'unsubscribe'){
             sub.status = 'unsubscribed';
