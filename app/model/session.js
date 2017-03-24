@@ -1,17 +1,16 @@
-var mongoose = require('mongoose');  
-var Schema   = mongoose.Schema,
-    error    = _require('util/error'),
-    security = _require('util/security'),
+var mongoose  = require('mongoose');  
+var Schema    = mongoose.Schema,
+    error     = _require('util/error'),
+    security  = _require('util/security'),
     passwords = _require('../passwords.json');
 
 var SessionSchema = new Schema({
-    //_id
-    user: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true},
-    secret: { type: String, required: true },
-    expiration: { type: String, required: true },
-    permissions: { type: Array },
-    subs: { type: Array },
-    //token: { type: String, required: true}
+    //token                                                                     // *a (virtual)
+    user: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true},  // *a
+    secret: { type: String, required: true },                                   // *a
+    expiration: { type: String, required: true },                               // *am not_implemented 
+    permissions: { type: Array },                                               // not_implemented
+    subs: { type: Array },                                                      // not_implemented
 })
 
 SessionSchema.virtual('token').get(function() {
@@ -24,7 +23,6 @@ SessionSchema.statics.newSession = function(userid, params){
         newsession.expiration = Date.now() + 1000*60*5; // Inventado (5 mins)
         newsession.user = userid;
         newsession.secret = security.genRandomKey();
-        //newsession.token = security.hashText(newsession._id);
         //newsession.permissions = params.permissions//['rdonly']
         //newsession.subs = params.subs//['ffsd']
         return newsession;

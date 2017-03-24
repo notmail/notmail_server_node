@@ -1,21 +1,17 @@
-var mongoose = require('mongoose');  
-var Schema   = mongoose.Schema,
-    error    = _require('util/error'),
-    security = _require('util/security');
+var mongoose   = require('mongoose');  
+var Schema     = mongoose.Schema,
+    error      = _require('util/error'),
+    security   = _require('util/security');
     UserSchema = require('./user');
-    //autoIncrement = require('mongoose-auto-increment');
-
-//autoIncrement.initialize(mongoose.connection);
 
 var SubscriptionSchema = new Schema({
-    //_id ('Number' )
-    app: {type: mongoose.Schema.Types.ObjectId, ref: 'Application', required: true},
-    user: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true},
-
-    status: {type: String, default: 'pending'},
-    validation: {type: String, required: false},
-    created: {type: Date, default: Date.now()}
-/*, { toObject: { virtuals: true ,toJSON: { virtuals: true }} */})
+    //_id / sub                                                                             // *a (json)
+    app:        {type: mongoose.Schema.Types.ObjectId, ref: 'Application', required: true}, // *a
+    user:       {type: mongoose.Schema.Types.ObjectId, ref: 'User', required:        true}, // *a
+    status:     {type: String, default:                     'pending'},                     // a
+    validation: {type: String, required:                    false},                         // *a
+    created:    {type: Date, default: Date.now()}                                           // *a
+})
 
 SubscriptionSchema.set('toJSON', {
     transform: function(doc, ret, options) {
@@ -30,13 +26,11 @@ SubscriptionSchema.set('toJSON', {
 
 SubscriptionSchema.statics.newSubscription = function(appref, userref){
     try{
-        newsubscription = new this();
-        newsubscription.status = 'pending';
+        newsubscription            = new this();
+        newsubscription.status     = 'pending';
         newsubscription.validation = security.genRandomValidation();
-        
-        newsubscription.app = appref;
-        newsubscription.user = userref;
-        //newsubscription.sub = security.hashText(this._id)
+        newsubscription.app        = appref;
+        newsubscription.user       = userref;
         return newsubscription;
     }catch(e){
         throw new Error('error creating new subscription. ' + e.message);
@@ -49,6 +43,7 @@ SubscriptionSchema.statics.getAppUserSubscriptions = function(appref, userref){
         throw new error.BadRequest('bad subscription')
     })
 }
+
 SubscriptionSchema.statics.getSubUserSubscription = function(subref, userref){
     return this.findOne({_id: subref, user: userref})
     .catch(e=>{
@@ -80,30 +75,30 @@ SubscriptionSchema.statics.getUserSubscriptions = function(userId, query, sub){
 }
 
 //////////////////////////
-SubscriptionSchema.methods.getApplication = function(){
-    var self = this;
-    return new Promise(function (resolve, reject) {
-        this.populate('_application')
-        .exec()
-        .then(app=>{
-            resolve(app)
-        })
-        .catch(e=>{
-            reject(new error.Removed('Associated application got removed from the server.'))
-        })
-    })
-}
+// SubscriptionSchema.methods.getApplication = function(){
+//     var self = this;
+//     return new Promise(function (resolve, reject) {
+//         this.populate('_application')
+//         .exec()
+//         .then(app=>{
+//             resolve(app)
+//         })
+//         .catch(e=>{
+//             reject(new error.Removed('Associated application got removed from the server.'))
+//         })
+//     })
+// }
 
 
 
 
-SubscriptionSchema.statics.updateSubscription = function(notmail, sub, op){
+// SubscriptionSchema.statics.updateSubscription = function(notmail, sub, op){
 
-    //return //this.find({sub: '$2a$10$zqrxTLkdGNPVfBQlDKQGpetG3ssOQK7c4V197otsY1Ytbe6N66S0a'})
-    //return this.findById(mongoose.Types.ObjectId('58d1642dd31e5bc5d8810395'))
-    return
+//     //return //this.find({sub: '$2a$10$zqrxTLkdGNPVfBQlDKQGpetG3ssOQK7c4V197otsY1Ytbe6N66S0a'})
+//     //return this.findById(mongoose.Types.ObjectId('58d1642dd31e5bc5d8810395'))
+//     return
 
-}
+// }
 
 /*
 SubscriptionSchema.statics.requestFindSubscription = function(user, appid){

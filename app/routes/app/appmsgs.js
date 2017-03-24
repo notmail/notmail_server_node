@@ -1,5 +1,6 @@
 var exports = module.exports = {};
-var error = _require('./util/error')
+var error   = _require('./util/error')
+
 /**
  *      common
  */
@@ -70,19 +71,6 @@ exports.registryPutResponse = function(app){
 /**
  *      /app/sub
  */
-// exports.subPutCheck = function(body){
-//     if(!body.dest)
-//         throw new error.BadRequest('dest missing');
-//     if(!body.dest.user)
-//         throw new error.BadRequest('user missing');
-//     return body
-// }
-
-// exports.subGetCheck = function(params){
-//     if(!params.user)
-//         throw new error.BadRequest('user param missing');
-// }
-
 exports.subPutResponse = function(sub){
     let response = {
         info:{
@@ -92,8 +80,19 @@ exports.subPutResponse = function(sub){
     return response;
 }
 
+exports.checkSubStatus = function(sub){
+    if (!sub)
+        throw new error.Forbidden('no subscription found');
+    else if(sub.status == 'pending' || sub.status == 'unsubscribed')
+        throw new error.Forbidden('subscription '+ sub.status);
+    else if(sub.status == 'subscribed') 
+        return true
+    else
+        throw new error.Forbidden('subscription '+ sub.status);
+}
+
 /**
- *      /app/sub
+ *      /app/msg
  */
 exports.msgPostCheck = function(body){
     if(!body.msg)

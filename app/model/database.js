@@ -1,11 +1,11 @@
 /* Imports */
-var mongoose = require('mongoose'),
-    Promise = require('bluebird');
-    //autoIncrement = require('mongoose-auto-increment');
+var mongoose        = require('mongoose'),
+    Promise         = require('bluebird'),
+    config          = _require('/../config');
 
 /* Setup */
 mongoose.Promise = Promise;
-mongoose.connect('mongodb://localhost/notmail');
+mongoose.connect(config.db_url);
 
 /* Schemas */
 require('./application');

@@ -1,6 +1,6 @@
-var crypto = require('crypto'),
-    bcrypt = require('bcryptjs'),
-    error = require('./error');
+var crypto    = require('crypto'),
+    bcrypt    = require('bcryptjs'),
+    error     = require('./error');
 
 var algorithm = 'aes-256-ctr';
 

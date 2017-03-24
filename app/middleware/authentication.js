@@ -1,7 +1,5 @@
 var Promise           = require('bluebird').Promise;
 var usermsgs          = _require('/routes/user/usermsgs'),
-    UserSchema        = _require('/model/user'),
-    security          = _require('/util/security'),
     reqtools          = _require('/util/reqtools');
     error             = _require('/util/error'),
     appmsgs           = _require('/routes/app/appmsgs.js'),
@@ -25,16 +23,11 @@ module.exports.applicationAuthenticate = function(req, res, then){
 module.exports.tokenAuthenticate = function(req, res, then){
 
     Promise.resolve()
-    .then(()=>{return usermsgs.checkAuthParams(req.query) })
-    .then((token)=>{
-        return SessionSchema.findSession(token[0], token[1])
-    })
-    .then(session=>{
-        req.session = session;
-        then()
-    })
-    .catch(e => {                                                                   // Send error response      
-        reqtools.errorHandler(e, res);
-    })
+    .then(()       => {return usermsgs.checkAuthParams(req.query) })                    // Validate request user auth params
+    .then((token)  => {return SessionSchema.findSession(token[0], token[1])})           // Check authentication
+    .then(session  => {req.session = session;                                           // Apply middleware 'storage'
+                       then()})
+    .catch(e       => {reqtools.errorHandler(e, res);})                                 // Send error response      
+
 
 }

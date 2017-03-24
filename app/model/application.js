@@ -1,23 +1,21 @@
-var mongoose = require('mongoose');  
-var Schema   = mongoose.Schema,
-    error    = _require('util/error'),
-    security = _require('util/security'),
+var mongoose  = require('mongoose');  
+var Schema    = mongoose.Schema,
+    error     = _require('util/error'),
+    security  = _require('util/security'),
     passwords = _require('../passwords.json');
 
 var ApplicationSchema = new Schema({
-    // Main fields
-    shared_key: { type: String, required: true },
-    root_secret: { type: String, required: true },
-    title: { type: String, required: true },
-    description: String,
-    url: String,
-    icon: String,
-    unsecured_source: { type: Boolean, required: true },
-
-    // Auto
-    created: { type: Date, default: Date.now },
-    updated: { type: Date, default: Date.now },
-    last_event: { type: Date, default: Date.now }
+    //unique_id                                                 // *a (virtual)
+    shared_key      : { type: String, required : true },        // *a
+    root_secret     : { type: String, required : true },        // *a
+    title           : { type: String, required : true },        // *m
+    unsecured_source: { type: Boolean, required: true },        // *a
+    description     : String,                                   // m
+    url             : String,                                   // m
+    icon            : String,                                   // m
+    created         : { type: Date, default    : Date.now },    // *a
+    //updated         : { type: Date, default    : Date.now }     // not_implemented
+    //last_event      : { type: Date, default    : Date.now }     // not_implemented
 })
 
 ApplicationSchema.virtual('unique_id').get(function() {

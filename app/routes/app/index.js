@@ -1,16 +1,14 @@
-var express = require('express'),
-    router = express.Router(),
-    authentication    = _require('/middleware/authentication'),
+var express        = require('express'),
+    router         = express.Router(),
+    authentication = _require('/middleware/authentication'),
     destination    = _require('/middleware/destination');
 
 /* Routes */
-router.use('/registry', require('./registry'))
-
-router.use(authentication.applicationAuthenticate)                                  // Application credentials
+router.use('/registry', require('./registry'))           // Application registry
+router.use(authentication.applicationAuthenticate)       // Application credentials middleware
 router.use(destination)                                  // Destination middleware
-
-router.use('/sub', require('./sub'))
-router.use('/msg', require('./msg'))
+router.use('/sub', require('./sub'))                     // Subscriptions
+router.use('/msg', require('./msg'))                     // Messages
 
 /* Logic  */
 router.get('/', function(req, res, next) {

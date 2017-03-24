@@ -1,7 +1,7 @@
 var router            = require('express').Router(),
     mongoose          = require('mongoose'),
-    Promise           = require('bluebird').Promise,
-    ApplicationSchema = _require('model/application'),
+    Promise           = require('bluebird').Promise;
+var ApplicationSchema = _require('model/application'),
     reqtools          = _require('util/reqtools'),
     error             = _require('util/error'),
     appmsgs           = require('./appmsgs.js'),
@@ -23,7 +23,7 @@ router.post('/', function(req, res, next) {
 })
 
 // Authentication Middleware
-router.use(authentication.applicationAuthenticate)                                  // Application credentials
+router.use(authentication.applicationAuthenticate)                                  // Application credentials middleware
 
 // GET /app/registry (infoApp)
 router.get('/', function(req, res, next) {
