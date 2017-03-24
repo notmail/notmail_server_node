@@ -66,7 +66,7 @@ SubscriptionSchema.methods.reset = function(){
 SubscriptionSchema.statics.getUserSubscriptions = function(userId, query, sub){
     let match = { user: userId };
     //let select = {}//{ validation: 1, status: 1, sub: 1, _id: 0 }
-    if(query === 'app')
+    if(query === 'sub')
         match._id = sub;
     else if(query === 'pending' || query === 'subscribed')
         match.status = query;

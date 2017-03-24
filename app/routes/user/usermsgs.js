@@ -38,7 +38,7 @@ exports.authGetResponse = function(notmail, session){
  *      /user/sub
  */
 exports.subGetCheck = function(query){          // HAY QUE METER ESTO
-    if(query.query && ['all, pending, subscribed, app'])
+    if(query.query && ['all', 'pending', 'subscribed', 'sub'].indexOf(query.query) == -1)
         throw new error.BadRequest('query error');
     if(query.query && query.query == 'app' && !query.sub)
         throw new error.BadRequest('no sub specified');

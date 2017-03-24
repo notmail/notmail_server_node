@@ -4,7 +4,8 @@ var express            = require('express'),
     UserSchema         = _require('/model/user'),
     SessionSchema      = _require('/model/session'),
     SubscriptionSchema = _require('/model/subscription'),
-    reqtools           = _require('/util/reqtools');
+    reqtools           = _require('/util/reqtools'),
+    Promise            = require('bluebird').Promise;
 
 /**
  * Routing
@@ -12,16 +13,19 @@ var express            = require('express'),
 // GET /user/sub (getSubscriptions)
 router.get('/', function(req, res, next) {
 
-    SubscriptionSchema.getUserSubscriptions(req.session.user._id, req.query.query, req.query.sub)   // Find subscriptions
-    .then(data=>{return usermsgs.subGetResponse(data)})                                             // Generate output
-    .then(response => {res.status(200).send(response)})                                             // Send correct response
-    .catch(e       => {reqtools.errorHandler(e, res);})                                             // Send error response      
-
+    Promise.resolve()
+    .then(()       => usermsgs.subGetCheck(req.query))                                          // Check request params
+    .then(()       => {return SubscriptionSchema.getUserSubscriptions                           // Find subscriptions
+                                (req.session.user._id, req.query.query, req.query.sub)})
+    .then(data     => {return usermsgs.subGetResponse(data)})                                   // Generate output
+    .then(response => {res.status(200).send(response)})                                         // Send correct response
+    .catch(e       => {reqtools.errorHandler(e, res);})                                         // Send error response  
+        
 })
 
 // PUT /user/sub (getSubscriptions)
 router.put('/', function(req, res, next) {
-
+    
     SubscriptionSchema.getSubUserSubscription(req.query.sub, req.session.user._id)
     .then(sub=>{
         if(!sub) new error.BadRequest('No such subscription')
@@ -36,7 +40,7 @@ router.put('/', function(req, res, next) {
             sub.delete();
         }
     })
-    .then(() => {res.status(200).end()})                             // Send correct response
+    .then(() => {res.status(200).end()})                                            // Send correct response
     .catch(e => {                                                                   // Send error response      
         reqtools.errorHandler(e, res);
     })
