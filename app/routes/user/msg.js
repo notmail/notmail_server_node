@@ -17,7 +17,7 @@ router.get('/', function(req, res, next) {
     .then(()    => {return MessageSchema.getMessages(req.session.user._id, req.query.query, req.query.sub, req.query.data, req.query.delete)})
     .then((data)=> {msgref = data;
                     if(req.query.data) data = data.reduce((r,msg)=>{return r+msg.data+req.query.data[0].charAt(0)},'')
-                    return data;})
+                    return {msgs:data}})
     .then((data)=> {res.status(200).send(data) })                     // Send correct response
     .then(()    => {if(req.query.delete == 1) return MessageSchema.delMessages(msgref)})
     .then((res) => {})
