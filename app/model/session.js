@@ -36,9 +36,16 @@ SessionSchema.statics.findSession = function(sessionId, secret){
     .populate('user')
     .then(session=>{
         if (!session || session.secret != secret) throw new error.Unauthorized('bad token');
+        if (session.expiration < Date.now()){
+            session.remove()
+            .then(()=>{})
+            .catch(()=>{})
+            throw new error.Unauthorized('token expired');
+        }
         return session
     })
     .catch(e=>{
+        if(e.name ==='Unauthorized') throw e
         throw new error.Unauthorized('bad token');
     })
 }
