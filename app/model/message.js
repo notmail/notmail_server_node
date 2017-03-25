@@ -20,6 +20,7 @@ var MessageSchema = new Schema({
 MessageSchema.set('toJSON', {
     transform: function(doc, ret, options) {
         return {
+            id: ret._id,
             title: ret.title,
             data: ret.data,
             type: ret.type || 'text',
@@ -48,10 +49,12 @@ MessageSchema.statics.newMessage = function(message, subscriptionId, userId){
     }
 }
 
-MessageSchema.statics.getMessages = function(userId, query, sub, data, del){
+MessageSchema.statics.getMessages = function(userId, query, sub, data, id){
     let match = { user: userId };
     if(query=='sub')
         match.sub = sub;
+    if(query=='id')
+        match._id = id;
     let select = null;
     if(data) {select = { data: 1 }}
     return this.find(match, select)
@@ -61,6 +64,7 @@ MessageSchema.statics.delMessages = function(messages){
     let ids = [];
     if (messages.constructor === Array) messages.forEach(msg=>ids.push(msg._id))
     else ids.push(messages._id)
+    console.log(ids)
     return this.remove({ _id: {$in: ids} })
 }
 

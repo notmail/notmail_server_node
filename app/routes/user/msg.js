@@ -15,7 +15,7 @@ router.get('/', function(req, res, next) {
 
     Promise.resolve()
     .then(()    => {return MessageSchema.getMessages(req.session.user._id,
-                     req.query.query, req.query.sub, req.query.data, req.query.delete)})
+                     req.query.query, req.query.sub, req.query.data, req.query.id)})
     .then((data)=> {msgref = data;
                     if(req.query.data)
                         data = data.reduce((r,msg)=>{return r+msg.data+req.query.data[0].charAt(0)},'')
@@ -24,6 +24,19 @@ router.get('/', function(req, res, next) {
     .then(()    => {if(req.query.delete == 1) return MessageSchema.delMessages(msgref)})
     .then((res) => {})
     .catch(e    => {reqtools.errorHandler(e, res);})                             // Send error response      
+    
+})
+
+// DELETE /usr/msg (deleteMessages)
+router.delete('/', function(req, res, next) {
+
+    Promise.resolve()
+    .then(()    => {return usermsgs.msgDelCheck(req.query)})
+    .then(()    => {return MessageSchema.getMessages(req.session.user._id,
+                            req.query.query, req.query.sub, false, req.query.id)})
+    .then((data)=> {return MessageSchema.delMessages(data)})
+    .then((data)=> {res.status(200).send({ result: data.result.n})})                // Send correct response
+    .catch(e    => {reqtools.errorHandler(e, res);})                                // Send error response      
     
 })
 
