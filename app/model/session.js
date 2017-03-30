@@ -8,7 +8,7 @@ var SessionSchema = new Schema({
     //token                                                                     // *a (virtual)
     user: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true},  // *a
     secret: { type: String, required: true },                                   // *a
-    expiration: { type: String, required: true },                               // *am not_implemented 
+    expiration: { type: String, required: true },                               // *am
     permissions: { type: Array },                                               // not_implemented
     subs: { type: Array },                                                      // not_implemented
 })
@@ -20,7 +20,7 @@ SessionSchema.virtual('token').get(function() {
 SessionSchema.statics.newSession = function(userid, params){
     try{
         newsession = new this();
-        newsession.expiration = Date.now() + 1000*60*5; // Inventado (5 mins)
+        newsession.expiration = Date.now() + 1000*60*15; // Inventado (15 mins)
         newsession.user = userid;
         newsession.secret = security.genRandomKey();
         //newsession.permissions = params.permissions//['rdonly']

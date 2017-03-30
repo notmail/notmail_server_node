@@ -18,7 +18,8 @@ SubscriptionSchema.set('toJSON', {
         return {
             sub: ret._id,
             status: ret.status,
-            validation: ret.validation
+            validation: ret.validation,
+            app: ret.app
         }
     },
     virtuals: true
@@ -71,7 +72,7 @@ SubscriptionSchema.statics.getUserSubscriptions = function(userId, query, sub){
     else if(query === 'pending' || query === 'subscribed')
         match.status = query;
 
-    return this.find(match)//, select)
+    return this.find(match).populate('app','-_id title description unsecured_source url icon')
 }
 
 //////////////////////////
