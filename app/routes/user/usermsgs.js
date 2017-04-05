@@ -71,7 +71,7 @@ exports.msgDelCheck = function(query){
     return query;
 }
 
-exports.msgDelCheck = function(query){       
+exports.msgEditCheck = function(query){       
     if(!query.query)
         throw new error.BadRequest('query error');
     else if (['sub', 'id'].indexOf(query.query) == -1)
@@ -80,8 +80,6 @@ exports.msgDelCheck = function(query){
         throw new error.BadRequest('query error, no sub');
     else if(query.query == 'id' && !query.id)
         throw new error.BadRequest('query error, no id');
-    else if(query.query == 'deleteall')
-        query.query = 'all'
     if(['markasread', 'markasnotread'].indexOf(query.op) == -1)
         throw new error.BadRequest('query error, no operation to perform');
     return query;

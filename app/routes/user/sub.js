@@ -4,6 +4,7 @@ var express            = require('express'),
     UserSchema         = _require('/model/user'),
     SessionSchema      = _require('/model/session'),
     SubscriptionSchema = _require('/model/subscription'),
+    MessageSchema      = _require('/model/message'),
     reqtools           = _require('/util/reqtools'),
     Promise            = require('bluebird').Promise;
 
@@ -37,7 +38,8 @@ router.put('/', function(req, res, next) {
             sub.status = 'unsubscribed';
             sub.save();
         }else if (req.query.op == 'delete'){
-            sub.delete();
+            sub.remove();
+            MessageSchema.remove({ sub: sub.sub })
         }
     })
     .then(() => {res.status(200).end()})                                            // Send correct response
