@@ -29,7 +29,8 @@ exports.authGetResponse = function(notmail, session){
         token: session.token,
         expiration: session.expiration,
         subs: session.subs,
-        permissions: session.permissions
+        permissions: session.permissions,
+        notmail: session.user.notmail
     }
     return response;
 }
