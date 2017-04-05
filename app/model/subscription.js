@@ -19,7 +19,8 @@ SubscriptionSchema.set('toJSON', {
             sub: ret._id,
             status: ret.status,
             validation: ret.validation,
-            app: ret.app
+            app: ret.app,
+            created: ret.created
         }
     },
     virtuals: true

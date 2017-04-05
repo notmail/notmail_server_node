@@ -40,7 +40,7 @@ router.delete('/', function(req, res, next) {
     
 })
 
-// PUT /usr/msg (deleteMessages)
+// PUT /usr/msg (editMessages)
 router.put('/', function(req, res, next) {
 
     Promise.resolve()
