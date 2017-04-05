@@ -4,11 +4,6 @@ var express        = require('express'),
     destination    = _require('/middleware/destination');
 
 /* Routes */
-router.use(function(req, res, next) {
-  res.set("Connection", "close");
-  next();
-});
-
 router.use('/registry', require('./registry'))           // Application registry
 router.use(authentication.applicationAuthenticate)       // Application credentials middleware
 router.use(destination)                                  // Destination middleware
