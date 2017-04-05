@@ -40,6 +40,18 @@ router.delete('/', function(req, res, next) {
     
 })
 
+// PUT /usr/msg (deleteMessages)
+router.put('/', function(req, res, next) {
+
+    Promise.resolve()
+    .then(()    => {return usermsgs.msgDelCheck(req.query)})
+    .then((data)=> {if( ['markasread', 'markasnotread'].indexOf(req.query.op) != -1) 
+                        return MessageSchema.editMessages(data)})
+    .then((data)=> {console.log(data);res.status(200).send({ result: data.n})})         // Send correct response
+    .catch(e    => {reqtools.errorHandler(e, res);})                                    // Send error response      
+    
+})
+
 
 /* Module settings */
 module.exports = router;
