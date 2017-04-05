@@ -20,7 +20,7 @@ SessionSchema.virtual('token').get(function() {
 SessionSchema.statics.newSession = function(userid, params){
     try{
         newsession = new this();
-        newsession.expiration = Date.now() + 1000*60*15; // Inventado (15 mins)
+        newsession.expiration = Date.now() + 1000*60*60*7; // Inventado (7 días)
         newsession.user = userid;
         newsession.secret = security.genRandomKey();
         //newsession.permissions = params.permissions//['rdonly']
@@ -41,6 +41,12 @@ SessionSchema.statics.findSession = function(sessionId, secret){
             .then(()=>{})
             .catch(()=>{})
             throw new error.Unauthorized('token expired');
+        }
+        else if(session.expiration < (Date.now() + 1000*60*60*2) ){ // 2 días
+            session.expiration = Date.now() + 1000*60*60*7;
+            session.save()
+            .then((session)=>{})
+            .catch(()=>{})
         }
         return session
     })
