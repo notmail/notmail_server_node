@@ -16,7 +16,6 @@ var express    = require('express'),
     config     = require('../config.json'),
     database   = require('./model/database');
 
-
 /**
  * Server
  */

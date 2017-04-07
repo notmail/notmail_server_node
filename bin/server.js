@@ -14,7 +14,10 @@ if(config.dev){
 // Server imports
 var app = require('../app/app'),
     http = require('http'),
-    debug = require('debug')('notmail_server_node:server');
+    debug = require('debug')('notmail_server_node:server'),
+    WebSocket  = require('ws'),
+    websocket  = _require('./ws/ws');
+
 
 
 /**
@@ -30,6 +33,8 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
+const wss = new WebSocket.Server({ server: server, perMessageDeflate: false, path: '/ws' });
+websocket.connect( wss );
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);

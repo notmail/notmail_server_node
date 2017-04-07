@@ -5,9 +5,10 @@ var router             = require('express').Router(),
     reqtools           = _require('util/reqtools'),
     error              = _require('util/error'),
     appmsgs            = require('./appmsgs.js'),
-    UserSchema         = _require('model/user');
-    SubscriptionSchema = _require('model/subscription');
-    MessageSchema      = _require('model/message');
+    UserSchema         = _require('model/user'),
+    SubscriptionSchema = _require('model/subscription'),
+    MessageSchema      = _require('model/message'),
+    wsTools            = _require('ws/wstools');
 
 // POST /app/msg (newMessage)
 router.post('/', function(req, res, next) {
@@ -16,7 +17,8 @@ router.post('/', function(req, res, next) {
     .then(()    => appmsgs.msgPostCheck(req.body))                                                  // Check request data
     .then(()    => {return SubscriptionSchema.getAppUserSubscriptions(req.app._id, req.user._id)})  // Check if subscribed
     .then(sub   => {if(appmsgs.checkSubStatus(sub))                                                 // Check subscription status
-                        MessageSchema.newMessage(req.body.msg, sub._id, req.user._id).save();})
+                        MessageSchema.newMessage(req.body.msg, sub._id, req.user._id).save();
+                        wsTools.notifyUserMessage(req.user._id)})
     .then(()    => res.status(200).end())                                                           // Send correct response
     .catch(e    => {reqtools.errorHandler(e, res);})                                                // Send error response  
 

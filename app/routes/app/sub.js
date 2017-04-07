@@ -5,8 +5,9 @@ var router             = require('express').Router(),
     reqtools           = _require('util/reqtools'),
     error              = _require('util/error'),
     appmsgs            = require('./appmsgs.js'),
-    UserSchema         = _require('model/user');
-    SubscriptionSchema = _require('model/subscription');
+    UserSchema         = _require('model/user'),
+    SubscriptionSchema = _require('model/subscription'),
+    wsTools            = _require('ws/wstools');
 
 // PUT /app/sub (subscriptionRequest)
 router.put('/', function(req, res, next) {
@@ -14,7 +15,8 @@ router.put('/', function(req, res, next) {
     Promise.resolve()
     .then(()       => {return SubscriptionSchema.getAppUserSubscriptions(req.app._id, req.user._id)})// Find if subscribed (y: reset, n: create)
     .then(sub      => {return (sub)? sub.reset().save() : SubscriptionSchema.newSubscription(req.app._id, req.user._id).save() })
-    .then(sub      => appmsgs.subPutResponse(sub))                                                   // Prepare response
+    .then(sub      => {wsTools.notifyUserSub(req.user._id);
+                       return appmsgs.subPutResponse(sub)})                                          // Prepare response
     .then(response => res.status(200).send(response))                                                // Send correct response
     .catch(e       => {reqtools.errorHandler(e, res);})                                              // Send error response      
 
