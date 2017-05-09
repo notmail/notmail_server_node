@@ -1,9 +1,8 @@
 var mongoose  = require('mongoose');  
 var Schema    = mongoose.Schema,
     error     = _require('util/error'),
-    security  = _require('util/security'),
-    passwords = _require('../passwords.json');
-
+    security  = _require('util/security');
+    
 var ApplicationSchema = new Schema({
     //unique_id                                                 // *a (virtual)
     shared_key      : { type: String, required : true },        // *a

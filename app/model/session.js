@@ -1,9 +1,8 @@
 var mongoose  = require('mongoose');  
 var Schema    = mongoose.Schema,
     error     = _require('util/error'),
-    security  = _require('util/security'),
-    passwords = _require('../passwords.json');
-
+    security  = _require('util/security');
+    
 var SessionSchema = new Schema({
     //token                                                                     // *a (virtual)
     user: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true},  // *a
