@@ -61,7 +61,7 @@ exports.registryGetResponse = function(app){
 
 exports.registryPutResponse = function(app){
     let response = {
-        app:{
+        auth:{
             shared_key: app.shared_key
         }
     }
