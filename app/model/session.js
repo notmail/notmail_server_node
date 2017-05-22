@@ -19,7 +19,7 @@ SessionSchema.virtual('token').get(function() {
 SessionSchema.statics.newSession = function(userid, params){
     try{
         newsession = new this();
-        newsession.expiration = Date.now() + 1000*60*60*7; // Inventado (7 días)
+        newsession.expiration = Date.now() + 1000*60*60*24*7; // Inventado (7 días)
         newsession.user = userid;
         newsession.secret = security.genRandomKey();
         //newsession.permissions = params.permissions//['rdonly']
